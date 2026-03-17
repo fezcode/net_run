@@ -47,6 +47,7 @@ interface GameState {
   toggleMusic: () => void;
   toggleTypingSounds: () => void;
   playTypingSound: () => void;
+  clearHistory: () => void;
 }
 
 const getDailyWord = () => {
@@ -142,6 +143,10 @@ export const useGameStore = create<GameState>()(
 
       toggleTypingSounds: () => {
         set((state) => ({ typingSoundsEnabled: !state.typingSoundsEnabled }));
+      },
+
+      clearHistory: () => {
+        set({ history: {} });
       },
 
       submitGuess: () => {

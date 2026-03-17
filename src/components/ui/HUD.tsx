@@ -3,7 +3,7 @@ import { useGameStore } from '../../game/store';
 import type { HistoryEntry } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play, History } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play, History, Trash2 } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -23,6 +23,7 @@ export function HUD() {
   const isStarted = useGameStore(s => s.isStarted);
   const startGame = useGameStore(s => s.startGame);
   const history = useGameStore(s => s.history);
+  const clearHistory = useGameStore(s => s.clearHistory);
 
   const [showHelp, setShowHelp] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -89,7 +90,6 @@ export function HUD() {
     <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 font-mono text-cyan-500 uppercase overflow-hidden">
       {/* Top Section: Header & Detection */}
       <div className="space-y-4">
-        {/* Header */}
         <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
           <div className="space-y-1">
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
@@ -106,7 +106,6 @@ export function HUD() {
           </div>
         </div>
 
-        {/* Detection Meter */}
         <div className="w-full flex flex-col items-center gap-1">
           <div className="flex justify-between w-full max-w-[500px] text-[8px] md:text-[10px]">
             <span className={detectionLevel > 70 ? 'text-red-500 animate-pulse' : 'text-cyan-500'}>DETECTION_RISK</span>
@@ -181,7 +180,18 @@ export function HUD() {
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowHistory(false)} />
           <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-2xl w-full max-h-[80vh] flex flex-col pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)]">
             <button onClick={() => setShowHistory(false)} className="absolute top-4 right-4 text-cyan-500 hover:text-white cursor-pointer"><X size={24} /></button>
-            <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">HACK_LOG_HISTORY</div>
+            <div className="flex justify-between items-center mb-6 border-b border-cyan-900 pb-2">
+              <div className="text-2xl font-black tracking-widest text-cyan-500">HACK_LOG_HISTORY</div>
+              {Object.keys(history).length > 0 && (
+                <button 
+                  onClick={() => { if(confirm('WIPE_HISTORY_BUFFER?')) clearHistory(); }}
+                  className="flex items-center gap-2 text-red-500 hover:text-white transition-colors text-[10px] font-bold cursor-pointer"
+                >
+                  <Trash2 size={12} />
+                  WIPE_BUFFER
+                </button>
+              )}
+            </div>
             
             <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
               {Object.keys(history).length === 0 ? (
@@ -215,7 +225,6 @@ export function HUD() {
         </div>
       )}
 
-      {/* Middle Section: Game Over Actions */}
       <div className="flex flex-col items-center justify-center flex-1">
         {isGameOver && (
            <div className="flex flex-col items-center gap-4 bg-black/80 p-6 md:p-8 backdrop-blur-2xl border border-cyan-500/20 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
@@ -228,7 +237,6 @@ export function HUD() {
         )}
       </div>
 
-      {/* Bottom Section: Keyboard & Footer */}
       <div className="flex flex-col items-center gap-4 md:gap-6">
         <VirtualKeyboard />
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
@@ -247,7 +255,6 @@ export function HUD() {
         </div>
       </div>
 
-      {/* Hidden Share Template */}
       <div className="fixed left-[-9999px] top-0">
         <div ref={shareRef} className="bg-[#050505] p-10 flex flex-col items-center gap-6 border-4 border-cyan-500/30" style={{ width: '500px' }}>
           <div className="text-3xl font-black text-white tracking-[0.3em] mb-4 border-b-2 border-cyan-500 pb-2 w-full text-center flex flex-col gap-2">
@@ -271,16 +278,12 @@ export function HUD() {
             ))}
           </div>
           <div className="mt-8 text-cyan-500 font-mono text-sm tracking-widest w-full flex justify-between opacity-70 items-center">
-            <div className="flex flex-col">
-              <span>DETECTION: {detectionLevel}%</span>
-              <span>MODE: {isDaily ? 'DAILY' : 'PRACTICE'}</span>
-            </div>
+            <div className="flex flex-col"><span>DETECTION: {detectionLevel}%</span><span>MODE: {isDaily ? 'DAILY' : 'PRACTICE'}</span></div>
             <div className="text-2xl font-black text-white border-l-2 border-cyan-500 pl-4">{formatTime(timer)}</div>
           </div>
         </div>
       </div>
 
-      {/* CRT Overlay Effect */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_100%),linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,118,0.06))] bg-[length:100%_100%,100%_2px,3px_100%] opacity-20" />
     </div>
   );
