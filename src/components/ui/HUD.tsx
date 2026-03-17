@@ -56,12 +56,6 @@ export function HUD() {
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
             <div className="text-[10px] md:text-xs opacity-70 flex items-center gap-2">
               <span>TERMINAL: 0x77-ALPHA</span>
-              <button 
-                onClick={() => setShowHelp(true)}
-                className="pointer-events-auto hover:text-white transition-colors cursor-pointer"
-              >
-                <HelpCircle size={14} />
-              </button>
               {isDaily && <span className="text-yellow-500 font-bold animate-pulse">[DAILY_SEQUENCE]</span>}
             </div>
           </div>
@@ -184,9 +178,15 @@ export function HUD() {
           <div className="flex flex-col items-center gap-1 opacity-40">
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
-          <div className="text-[8px] md:text-[10px] text-right space-y-1 opacity-60">
-            <div className="hidden md:block">SIGNAL: STABLE</div>
-            <div>LAT: 12ms</div>
+          
+          {/* Bigger Square Help Button at Bottom Right */}
+          <div className="flex items-center">
+            <button 
+              onClick={() => setShowHelp(true)}
+              className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+            >
+              <HelpCircle size={window.innerWidth < 768 ? 20 : 28} />
+            </button>
           </div>
         </div>
       </div>
