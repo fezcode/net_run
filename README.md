@@ -1,73 +1,80 @@
-# React + TypeScript + Vite
+# 📟 NET_RUN | BYPASS INTERFACE
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![NET_RUN Banner](./banner-image.png)
 
-Currently, two official plugins are available:
+> **"High-tech, low-life word hacking."**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+`NET_RUN` is a high-fidelity 3D Cyberpunk Wordle clone built with **React**, **Three.js**, and **React Three Fiber**. Unlike traditional word puzzles, you are an operative attempting to bypass secure encryption nodes. Every wrong letter increases your **Detection Risk**—hit 100%, and the connection is terminated.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ⚡ system_features
 
-## Expanding the ESLint configuration
+-   **3D Hacking Environment**: A fully immersive terminal space with wobbling neon node cubes and a floating grid.
+-   **Daily Sequence**: A unique encryption key every 24 hours (UTC), synced for all operatives globally.
+-   **Detection Mechanics**: Every incorrect letter submission increases your trace risk.
+-   **Practice Mode**: Re-run the interface with randomized sequences to sharpen your skills.
+-   **Hack Logs**: Automatic persistence of your daily performance with a downloadable 2D matrix PNG share feature.
+-   **Atmospheric Audio**: Randomized space-ambient playlist and haptic typing sensors (customizable in options).
+-   **Visual Polish**: Advanced post-processing including Bloom, Chromatic Aberration, and Glitch effects on failure.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 tech_stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+-   **Framework**: [React 19](https://react.dev/)
+-   **3D Engine**: [Three.js](https://threejs.org/) via [@react-three/fiber](https://github.com/pmndrs/react-three-fiber)
+-   **State**: [Zustand](https://github.com/pmndrs/zustand) + Persist Middleware
+-   **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+-   **Post-Processing**: [@react-three/postprocessing](https://github.com/pmndrs/react-postprocessing)
+-   **Animation**: [Framer Motion](https://www.framer.com/motion/)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 deployment_protocol
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### initiation
+```bash
+# clone the repository
+git clone https://github.com/yourusername/netrun.git
+
+# enter the terminal
+cd netrun
+
+# install dependencies
+npm install --legacy-peer-deps
+
+# boot the local instance
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### build_&_deploy
+```bash
+# generate production build
+npm run build
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# deploy to github pages
+npm run deploy
 ```
+
+---
+
+## 🎮 how_to_play
+
+1.  **Input**: Type using your physical keyboard or the on-screen virtual interface.
+2.  **Submit**: Press `ENTER` to attempt a bypass once 5 letters are entered.
+3.  **Analyze**:
+    -   🟢 **Green**: Correct letter, correct node.
+    -   🟡 **Yellow**: Correct letter, wrong node.
+    -   ⚪ **Gray**: Letter does not exist in the sequence.
+4.  **Risk**: Watch the **Detection Meter**. Too many wrong letters will trigger a system lockout.
+5.  **Trace**: You have 5 minutes before the security trace completes.
+
+---
+
+## 📜 credits
+
+-   **Music**: 
+    -   *Space Ambient* by [Владислав Заворин](https://pixabay.com/tr/users/%D0%B2%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2_%D0%B7%D0%B0%D0%B2%D0%BE%D1%80%D0%B8%D0%BD-43127785/)
+    -   *Space* by [Dmitrii Kolesnikov](https://pixabay.com/tr/users/the_mountain-3616498/)
+-   **Interface**: Developed by [fezcode.com](https://fezcode.com)
+
+---
+
+> **WARNING**: Unauthorized access to secure nodes is a violation of the Neo-Tokyo Data Act. Play at your own risk.
