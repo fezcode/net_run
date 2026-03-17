@@ -15,7 +15,7 @@ export function NodeCube({ letter, status, position, isCurrentFocus }: NodeCubeP
   const cursorRef = useRef<THREE.Mesh>(null);
 
   const colors = {
-    none: '#444', 
+    none: '#888', 
     correct: '#00ff00',
     misplaced: '#ffff00',
     wrong: '#ff0000',
