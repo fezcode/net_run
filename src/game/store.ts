@@ -105,24 +105,45 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    const newUsedLetters = { ...usedLetters };
-    const newRow: NodeStatus[] = currentInput.split('').map((letter, i) => {
-      let status: 'correct' | 'misplaced' | 'wrong' = 'wrong';
-      if (letter === targetWord[i]) status = 'correct';
-      else if (targetWord.includes(letter)) status = 'misplaced';
-      
-      const currentStatus = newUsedLetters[letter];
-      if (status === 'correct' || currentStatus !== 'correct') {
-        if (status === 'correct' || currentStatus !== 'misplaced' || status === 'misplaced') {
-           newUsedLetters[letter] = status;
-        }
-      }
+    // Precise Wordle logic for duplicate letters
+    const targetArr = targetWord.split('');
+    const inputArr = currentInput.split('');
+    const result: NodeStatus[] = Array(5).fill(null).map((_, i) => ({ letter: inputArr[i], status: 'wrong' }));
+    const targetCharCount: Record<string, number> = {};
 
-      return { letter, status };
+    // First pass: find all "correct" matches
+    targetArr.forEach((char, i) => {
+      if (inputArr[i] === char) {
+        result[i].status = 'correct';
+        targetArr[i] = ''; // Mark as used
+      } else {
+        targetCharCount[char] = (targetCharCount[char] || 0) + 1;
+      }
+    });
+
+    // Second pass: find all "misplaced" matches
+    inputArr.forEach((char, i) => {
+      if (result[i].status !== 'correct' && targetCharCount[char] > 0) {
+        result[i].status = 'misplaced';
+        targetCharCount[char]--;
+      }
+    });
+
+    // Update keyboard mapping
+    const newUsedLetters = { ...usedLetters };
+    result.forEach(({ letter, status }) => {
+      const currentStatus = newUsedLetters[letter];
+      if (status === 'correct') {
+        newUsedLetters[letter] = 'correct';
+      } else if (status === 'misplaced' && currentStatus !== 'correct') {
+        newUsedLetters[letter] = 'misplaced';
+      } else if (status === 'wrong' && !currentStatus) {
+        newUsedLetters[letter] = 'wrong';
+      }
     });
 
     const newGuesses = [...guesses];
-    newGuesses[currentRow] = newRow;
+    newGuesses[currentRow] = result;
 
     if (currentInput === targetWord) {
       set({
