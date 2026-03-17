@@ -8,6 +8,7 @@ export function HUD() {
   const currentInput = useGameStore(s => s.currentInput);
   const tickTimer = useGameStore(s => s.tickTimer);
   const initGame = useGameStore(s => s.initGame);
+  const isDaily = useGameStore(s => s.isDaily);
 
   useEffect(() => {
     const interval = setInterval(tickTimer, 1000);
@@ -28,7 +29,10 @@ export function HUD() {
       <div className="flex justify-between items-start border-b border-cyan-900/50 pb-4 bg-black/20 backdrop-blur-sm">
         <div className="space-y-1">
           <div className="text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
-          <div className="text-xs opacity-70">TERMINAL: 0x77-ALPHA</div>
+          <div className="text-xs opacity-70 flex gap-2">
+            <span>TERMINAL: 0x77-ALPHA</span>
+            {isDaily && <span className="text-yellow-500 font-bold text-[10px] animate-pulse">[DAILY_SEQUENCE_ACTIVE]</span>}
+          </div>
         </div>
         <div className="text-right">
           <div className="text-xs opacity-70 mb-1">SECURITY TRACE</div>
@@ -41,12 +45,15 @@ export function HUD() {
       {/* Center Actions */}
       <div className="flex flex-col items-center justify-center flex-1">
         {gameStatus !== 'hacking' && (
-           <button 
-             className="pointer-events-auto bg-cyan-500 text-black px-8 py-2 font-bold hover:bg-white transition-colors animate-bounce cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.5)]"
-             onClick={() => initGame()}
-           >
-             REBOOT SYSTEM
-           </button>
+           <div className="flex flex-col items-center gap-4">
+             <div className="text-white text-sm opacity-80 mb-2">SEQUENCE COMPLETED</div>
+             <button 
+               className="pointer-events-auto bg-cyan-500 text-black px-8 py-2 font-bold hover:bg-white transition-colors animate-bounce cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+               onClick={() => initGame(undefined, true)} 
+             >
+               INITIATE PRACTICE HACK
+             </button>
+           </div>
         )}
       </div>
 
@@ -76,7 +83,7 @@ export function HUD() {
                 BYPASS KEYS: [A-Z] [BACKSPACE] [ENTER]
               </div>
             )}
-            <div className="text-[8px] opacity-40">ENCRYPTION: AES-256-R3F | PROTOCOL: WORDLE-V3</div>
+            <div className="text-[8px] opacity-40">ENCRYPTION: AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
 
           <div className="text-[10px] text-right space-y-1 opacity-60">

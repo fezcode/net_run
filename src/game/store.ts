@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { sgbWords } from './words';
+import answers from './answers.json';
 
 export type GameStatus = 'idle' | 'hacking' | 'success' | 'failed';
 
@@ -16,14 +17,21 @@ interface GameState {
   gameStatus: GameStatus;
   message: string;
   timer: number;
+  isDaily: boolean;
   
   // Actions
-  initGame: (word?: string) => void;
+  initGame: (word?: string, forcePractice?: boolean) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
   submitGuess: () => void;
   tickTimer: () => void;
 }
+
+const getDailyWord = () => {
+  const today = new Date().toISOString().split('T')[0];
+  const word = (answers as Record<string, string>)[today];
+  return word ? word.toUpperCase() : 'CYBER'; // Fallback
+};
 
 const getRandomWord = () => {
   return sgbWords[Math.floor(Math.random() * sgbWords.length)].toUpperCase();
@@ -36,18 +44,22 @@ export const useGameStore = create<GameState>((set, get) => ({
   currentInput: '',
   gameStatus: 'idle',
   message: 'SYSTEM READY. INITIATE HACK...',
-  timer: 300, // 5 minutes
+  timer: 300,
+  isDaily: true,
 
-  initGame: (word) => {
-    const finalWord = word ? word.toUpperCase() : getRandomWord();
+  initGame: (word, forcePractice) => {
+    const isDaily = !word && !forcePractice;
+    const finalWord = word ? word.toUpperCase() : (isDaily ? getDailyWord() : getRandomWord());
+    
     set({
       targetWord: finalWord,
       guesses: Array(6).fill(null).map(() => Array(finalWord.length).fill({ letter: '', status: 'none' })),
       currentRow: 0,
       currentInput: '',
       gameStatus: 'hacking',
-      message: 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
+      message: isDaily ? 'DAILY ENCRYPTION DETECTED. BYPASSING...' : 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
       timer: 300,
+      isDaily
     });
   },
 
