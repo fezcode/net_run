@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -19,6 +19,8 @@ export function HUD() {
   const toggleMusic = useGameStore(s => s.toggleMusic);
   const typingSoundsEnabled = useGameStore(s => s.typingSoundsEnabled);
   const toggleTypingSounds = useGameStore(s => s.toggleTypingSounds);
+  const isStarted = useGameStore(s => s.isStarted);
+  const startGame = useGameStore(s => s.startGame);
 
   const [showHelp, setShowHelp] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -50,6 +52,39 @@ export function HUD() {
 
   const isIdle = currentInput.length === 0;
   const isGameOver = gameStatus === 'success' || gameStatus === 'failed';
+
+  if (!isStarted) {
+    return (
+      <div className="fixed inset-0 z-[300] bg-[#050505] flex flex-col items-center justify-center p-4 font-mono">
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_100%),linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,118,0.06))] bg-[length:100%_100%,100%_2px,3px_100%] opacity-40" />
+        
+        <div className="relative flex flex-col items-center gap-8 max-w-md w-full text-center">
+          <div className="space-y-2">
+            <h1 className="text-4xl md:text-6xl font-black text-white tracking-[0.2em] animate-pulse">NET_RUN</h1>
+            <p className="text-cyan-500 text-xs md:text-sm tracking-[0.4em] opacity-70">ENCRYPTION_BYPASS_INTERFACE</p>
+          </div>
+
+          <div className="w-full h-px bg-cyan-900/50" />
+
+          <button 
+            onClick={() => startGame()}
+            className="group pointer-events-auto relative px-12 py-4 bg-transparent border-2 border-cyan-500 text-cyan-500 font-bold tracking-[0.3em] overflow-hidden hover:text-black transition-colors cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-cyan-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+            <span className="relative z-10 flex items-center gap-3">
+              <Play size={18} fill="currentColor" />
+              INITIATE_SESSION
+            </span>
+          </button>
+
+          <div className="text-[10px] text-cyan-900 space-y-1 mt-4">
+            <div>AUTHORIZED ACCESS ONLY</div>
+            <div>STAY WITHIN TRACE THRESHOLD</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 font-mono text-cyan-500 uppercase overflow-hidden">
@@ -179,22 +214,41 @@ export function HUD() {
               <div className="space-y-4 pt-4 border-t border-cyan-900/50">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
                 
-                <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60">
-                  Music by <a 
-                    href="https://pixabay.com/tr/users/владислав_заворин-43127785/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
-                  >
-                    ВЛАДИСЛАВ / VLADISLAV ЗАВОРИН / ZAVORIN <ExternalLink size={8} />
-                  </a> from <a 
-                    href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
-                  >
-                    Pixabay <ExternalLink size={8} />
-                  </a>
+                <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2">
+                  <div>
+                    Music by <a 
+                      href="https://pixabay.com/tr/users/владислав_заворин-43127785/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                    >
+                      ВЛАДИСЛАВ / VLADISLAV ЗАВОРИН / ZAVORIN <ExternalLink size={8} />
+                    </a> from <a 
+                      href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                    >
+                      Pixabay <ExternalLink size={8} />
+                    </a>
+                  </div>
+                  <div>
+                    Music by <a 
+                      href="https://pixabay.com/tr/users/the_mountain-3616498/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=438391" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                    >
+                      Dmitrii Kolesnikov <ExternalLink size={8} />
+                    </a> from <a 
+                      href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=438391" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                    >
+                      Pixabay <ExternalLink size={8} />
+                    </a>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-center gap-2 text-xs">

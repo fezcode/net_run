@@ -23,8 +23,10 @@ interface GameState {
   detectionLevel: number;
   musicEnabled: boolean;
   typingSoundsEnabled: boolean;
+  isStarted: boolean;
   
   // Actions
+  startGame: () => void;
   initGame: (word?: string, forcePractice?: boolean) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
@@ -68,6 +70,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   detectionLevel: 0,
   musicEnabled: true,
   typingSoundsEnabled: true,
+  isStarted: false,
+
+  startGame: () => set({ isStarted: true }),
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
