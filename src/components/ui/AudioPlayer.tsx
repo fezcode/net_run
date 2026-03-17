@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useGameStore } from '../../game/store';
 
 const PLAYLIST = [
-  '/music-vladislav_zavorin-space-ambient-433363.mp3',
-  '/music-the_mountain-space-438391.mp3'
-];
+  'music-vladislav_zavorin-space-ambient-433363.mp3',
+  'music-the_mountain-space-438391.mp3'
+].map(file => `${import.meta.env.BASE_URL}${file}`);
 
 export function AudioPlayer() {
   const musicEnabled = useGameStore(s => s.musicEnabled);
@@ -29,7 +29,6 @@ export function AudioPlayer() {
       audioRef.current.play().catch(err => {
         console.warn('Audio play blocked. Waiting for interaction.', err);
         
-        // Retry play on first user interaction if blocked
         const retryPlay = () => {
           if (useGameStore.getState().musicEnabled) {
             audioRef.current?.play().catch(() => {});

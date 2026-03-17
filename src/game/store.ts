@@ -61,12 +61,12 @@ const getRandomWord = () => {
 };
 
 const typeSounds = [
-  '/button-21.mp3',
-  '/button-22.mp3',
-  '/button-23.mp3',
-  '/button-24.mp3',
-  '/button-25.mp3'
-];
+  'button-21.mp3',
+  'button-22.mp3',
+  'button-23.mp3',
+  'button-24.mp3',
+  'button-25.mp3'
+].map(file => `${import.meta.env.BASE_URL}${file}`);
 
 export const useGameStore = create<GameState>()(
   persist(
