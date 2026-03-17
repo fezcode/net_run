@@ -3,7 +3,7 @@ import { useGameStore } from '../../game/store';
 import type { HistoryEntry } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play, History, Trash2, LayoutPanelTop } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, Keyboard, Play, History, Trash2, LayoutPanelTop } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
