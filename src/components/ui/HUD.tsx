@@ -3,7 +3,7 @@ import { useGameStore } from '../../game/store';
 import type { HistoryEntry } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play, History, Trash2 } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard, Play, History, Trash2, LayoutPanelTop } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -28,12 +28,20 @@ export function HUD() {
   const [showHelp, setShowHelp] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [hideGameOverModal, setHideGameOverModal] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const interval = setInterval(tickTimer, 1000);
     return () => clearInterval(interval);
   }, [tickTimer]);
+
+  // Reset hide state when game starts
+  useEffect(() => {
+    if (gameStatus === 'hacking') {
+      setHideGameOverModal(false);
+    }
+  }, [gameStatus]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -160,13 +168,13 @@ export function HUD() {
                 <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>TYPING_SENSORS</span></div>
                 <button onClick={toggleTypingSounds} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${typingSoundsEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${typingSoundsEnabled ? 'translate-x-6' : ''}`} /></button>
               </div>
-              <div className="space-y-4 pt-4 border-t border-cyan-900/50">
+              <div className="space-y-4 pt-4 border-t border-cyan-900/50 text-center">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
-                <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2">
-                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">ВЛАДИСЛАВ ЗАВОРИН <ExternalLink size={8} /></a> from Pixabay</div>
-                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Dmitrii Kolesnikov <ExternalLink size={8} /></a> from Pixabay</div>
+                <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2 text-left">
+                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">ВЛАДИСЛАВ ЗАВОРИН</a> from Pixabay</div>
+                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Dmitrii Kolesnikov</a> from Pixabay</div>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-xs"><span className="opacity-40 tracking-widest">DEVELOPED_BY</span><a href="https://fezcode.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 font-bold hover:text-white transition-colors">FEZCODE.COM</a></div>
+                <div className="flex items-center justify-center gap-2 text-xs pt-2"><span className="opacity-40 tracking-widest">DEVELOPED_BY</span><a href="https://fezcode.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 font-bold hover:text-white transition-colors">FEZCODE.COM</a></div>
               </div>
             </div>
             <button onClick={() => setShowOptions(false)} className="mt-8 w-full bg-cyan-500 text-black py-3 font-bold hover:bg-white transition-colors cursor-pointer">EXIT_OPTIONS</button>
@@ -183,20 +191,11 @@ export function HUD() {
             <div className="flex justify-between items-center mb-6 border-b border-cyan-900 pb-2">
               <div className="text-2xl font-black tracking-widest text-cyan-500">HACK_LOG_HISTORY</div>
               {Object.keys(history).length > 0 && (
-                <button 
-                  onClick={() => { if(confirm('WIPE_HISTORY_BUFFER?')) clearHistory(); }}
-                  className="flex items-center gap-2 text-red-500 hover:text-white transition-colors text-[10px] font-bold cursor-pointer"
-                >
-                  <Trash2 size={12} />
-                  WIPE_BUFFER
-                </button>
+                <button onClick={() => { if(confirm('WIPE_HISTORY_BUFFER?')) clearHistory(); }} className="flex items-center gap-2 text-red-500 hover:text-white transition-colors text-[10px] font-bold cursor-pointer"><Trash2 size={12} />WIPE_BUFFER</button>
               )}
             </div>
-            
             <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-              {Object.keys(history).length === 0 ? (
-                <div className="text-center py-10 opacity-40 italic">NO_LOGS_FOUND_IN_BUFFER</div>
-              ) : (
+              {Object.keys(history).length === 0 ? (<div className="text-center py-10 opacity-40 italic">NO_LOGS_FOUND_IN_BUFFER</div>) : (
                 Object.values(history).sort((a, b) => b.date.localeCompare(a.date)).map((entry: HistoryEntry) => (
                   <div key={entry.date} className="flex items-center justify-between p-3 bg-cyan-950/10 border border-cyan-900/30 hover:border-cyan-500/50 transition-colors">
                     <div className="space-y-1">
@@ -212,9 +211,7 @@ export function HUD() {
                         <div className="text-[10px] opacity-50">TIME</div>
                         <div className="text-xs font-bold text-white">{formatTime(entry.timer)}</div>
                       </div>
-                      <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? 'bg-green-500 text-black' : 'bg-red-500 text-black'}`}>
-                        {entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}
-                      </div>
+                      <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? 'bg-green-500 text-black' : 'bg-red-500 text-black'}`}>{entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}</div>
                     </div>
                   </div>
                 ))
@@ -225,18 +222,22 @@ export function HUD() {
         </div>
       )}
 
-      <div className="flex flex-col items-center justify-center flex-1">
-        {isGameOver && (
-           <div className="flex flex-col items-center gap-4 bg-black/80 p-6 md:p-8 backdrop-blur-2xl border border-cyan-500/20 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+      {/* Game Over Modal */}
+      {isGameOver && !hideGameOverModal && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
+           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" onClick={() => setHideGameOverModal(true)} />
+           <div className="relative flex flex-col items-center gap-4 bg-black/90 p-6 md:p-8 border border-cyan-500/20 shadow-[0_0_50px_rgba(0,0,0,0.8)] pointer-events-auto">
+             <button onClick={() => setHideGameOverModal(true)} className="absolute top-2 right-2 text-cyan-500/50 hover:text-white cursor-pointer"><X size={20} /></button>
              <div className="text-white text-xs md:text-sm font-bold tracking-[0.2em] mb-2">HACK_SEQUENCE_TERMINATED</div>
              <div className="flex flex-col sm:flex-row gap-3 w-full">
                <button className="pointer-events-auto bg-white text-black px-6 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center" onClick={handleShare}>DOWNLOAD_LOG</button>
                <button className="pointer-events-auto bg-cyan-500 text-black px-6 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center" onClick={() => initGame(undefined, true)}>NEW_INSTANCE</button>
              </div>
            </div>
-        )}
-      </div>
+        </div>
+      )}
 
+      {/* Bottom Section: Keyboard & Footer */}
       <div className="flex flex-col items-center gap-4 md:gap-6">
         <VirtualKeyboard />
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
@@ -248,6 +249,9 @@ export function HUD() {
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
           <div className="flex items-center flex-1 justify-end gap-2 md:gap-3">
+            {isGameOver && hideGameOverModal && (
+              <button onClick={() => setHideGameOverModal(false)} className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-white/10 border border-white/20 hover:bg-white/20 text-white transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.1)]"><LayoutPanelTop size={window.innerWidth < 768 ? 20 : 28} /></button>
+            )}
             <button onClick={() => setShowHistory(true)} className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"><History size={window.innerWidth < 768 ? 20 : 28} /></button>
             <button onClick={() => setShowOptions(true)} className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"><Settings size={window.innerWidth < 768 ? 20 : 28} /></button>
             <button onClick={() => setShowHelp(true)} className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"><HelpCircle size={window.innerWidth < 768 ? 20 : 28} /></button>
