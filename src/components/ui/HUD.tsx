@@ -48,13 +48,13 @@ export function HUD() {
 
   return (
     <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 font-mono text-cyan-500 uppercase overflow-hidden">
-      {/* Top Section: Header & Message */}
+      {/* Top Section: Header & Detection */}
       <div className="space-y-4">
         {/* Header */}
         <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
           <div className="space-y-1">
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
-            <div className="text-[10px] md:text-xs opacity-70 flex items-center gap-2">
+            <div className="text-[10px] md:text-xs opacity-70 flex flex-col md:flex-row md:gap-2">
               <span>TERMINAL: 0x77-ALPHA</span>
               {isDaily && <span className="text-yellow-500 font-bold animate-pulse">[DAILY_SEQUENCE]</span>}
             </div>
@@ -78,18 +78,6 @@ export function HUD() {
               className={`h-full transition-all duration-500 ${detectionLevel > 70 ? 'bg-red-500 shadow-[0_0_15px_red]' : 'bg-cyan-500 shadow-[0_0_15px_cyan]'}`}
               style={{ width: `${detectionLevel}%` }}
             />
-          </div>
-        </div>
-
-        {/* Status Message at TOP */}
-        <div className="flex justify-center">
-          <div className="bg-black/60 border border-cyan-500/30 p-2 md:p-3 min-w-[200px] md:min-w-[350px] text-center backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.1)]">
-            <div className="text-[7px] md:text-[9px] opacity-50 mb-0.5 h-3">
-              {gameStatus === 'hacking' ? (isIdle ? 'AWAITING INPUT...' : 'PROCESSING...') : 'TERMINAL OUTPUT'}
-            </div>
-            <div className="text-xs md:text-sm tracking-widest font-bold text-white break-words">
-              {message}
-            </div>
           </div>
         </div>
       </div>
@@ -150,13 +138,13 @@ export function HUD() {
              
              <div className="flex flex-col sm:flex-row gap-3 w-full">
                <button 
-                 className="pointer-events-auto bg-white text-black px-6 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
+                 className="pointer-events-auto bg-white text-black px-6 md:px-8 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
                  onClick={handleShare}
                >
                  DOWNLOAD_LOG
                </button>
                <button 
-                 className="pointer-events-auto bg-cyan-500 text-black px-6 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center"
+                 className="pointer-events-auto bg-cyan-500 text-black px-6 md:px-8 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center"
                  onClick={() => initGame(undefined, true)} 
                >
                  NEW_INSTANCE
@@ -171,15 +159,21 @@ export function HUD() {
         <VirtualKeyboard />
 
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
-          <div className="text-[8px] md:text-[10px] space-y-1 opacity-60">
-            <div className="hidden md:block">IP: 192.168.0.1</div>
-            <div>LOC: NEO_TOKYO</div>
+          {/* Relocated Message Box content to Left of Footer */}
+          <div className="flex-1 flex flex-col justify-end h-full max-w-[40%]">
+            <div className="text-[7px] md:text-[9px] opacity-50 mb-0.5 uppercase">
+              {gameStatus === 'hacking' ? (isIdle ? 'AWAITING INPUT...' : 'PROCESSING...') : 'TERMINAL OUTPUT'}
+            </div>
+            <div className="text-[10px] md:text-sm tracking-widest font-bold text-white break-words line-clamp-2">
+              {message}
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-1 opacity-40">
+          
+          <div className="flex flex-col items-center gap-1 opacity-40 px-2 flex-1 text-center">
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex items-center flex-1 justify-end">
             <button 
               onClick={() => setShowHelp(true)}
               className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"
