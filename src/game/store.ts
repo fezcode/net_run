@@ -18,6 +18,7 @@ interface GameState {
   message: string;
   timer: number;
   isDaily: boolean;
+  usedLetters: Record<string, 'correct' | 'misplaced' | 'wrong' | 'none'>;
   
   // Actions
   initGame: (word?: string, forcePractice?: boolean) => void;
@@ -46,6 +47,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   message: 'SYSTEM READY. INITIATE HACK...',
   timer: 300,
   isDaily: true,
+  usedLetters: {},
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
@@ -59,7 +61,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       gameStatus: 'hacking',
       message: isDaily ? 'DAILY ENCRYPTION DETECTED. BYPASSING...' : 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
       timer: 300,
-      isDaily
+      isDaily,
+      usedLetters: {}
     });
   },
 
@@ -78,7 +81,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   submitGuess: () => {
-    const { currentInput, targetWord, currentRow, guesses, gameStatus } = get();
+    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters } = get();
     if (gameStatus !== 'hacking') return;
     
     if (currentInput.length !== targetWord.length) {
@@ -91,10 +94,21 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
+    const newUsedLetters = { ...usedLetters };
     const newRow: NodeStatus[] = currentInput.split('').map((letter, i) => {
-      if (letter === targetWord[i]) return { letter, status: 'correct' };
-      if (targetWord.includes(letter)) return { letter, status: 'misplaced' };
-      return { letter, status: 'wrong' };
+      let status: 'correct' | 'misplaced' | 'wrong' = 'wrong';
+      if (letter === targetWord[i]) status = 'correct';
+      else if (targetWord.includes(letter)) status = 'misplaced';
+      
+      // Update keyboard mapping
+      const currentStatus = newUsedLetters[letter];
+      if (status === 'correct' || currentStatus !== 'correct') {
+        if (status === 'correct' || currentStatus !== 'misplaced' || status === 'misplaced') {
+           newUsedLetters[letter] = status;
+        }
+      }
+
+      return { letter, status };
     });
 
     const newGuesses = [...guesses];
@@ -105,12 +119,14 @@ export const useGameStore = create<GameState>((set, get) => ({
         guesses: newGuesses,
         gameStatus: 'success',
         message: 'ENCRYPTION BYPASSED. ACCESS GRANTED.',
+        usedLetters: newUsedLetters
       });
     } else if (currentRow === 5) {
       set({
         guesses: newGuesses,
         gameStatus: 'failed',
         message: `TRACE COMPLETED. ACCESS DENIED. KEY: ${targetWord}`,
+        usedLetters: newUsedLetters
       });
     } else {
       set({
@@ -118,6 +134,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         currentRow: currentRow + 1,
         currentInput: '',
         message: 'NODE REJECTED. RETRYING...',
+        usedLetters: newUsedLetters
       });
     }
   },
