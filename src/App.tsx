@@ -1,25 +1,33 @@
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { PerspectiveCamera, OrbitControls, Stars } from '@react-three/drei';
 import { Bloom, EffectComposer, Noise, ChromaticAberration, Glitch } from '@react-three/postprocessing';
 import { NodeGrid } from './components/environment/NodeGrid';
 import { HUD } from './components/ui/HUD';
 import { KeyboardHandler } from './components/ui/KeyboardHandler';
 import { useGameStore } from './game/store';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 
 function Scene() {
   const gameStatus = useGameStore(s => s.gameStatus);
+  const { viewport } = useThree();
+  
+  // Dynamic scaling based on viewport width
+  const responsiveScale = useMemo(() => {
+    return Math.min(viewport.width / 6, 1);
+  }, [viewport.width]);
 
   return (
     <>
       <color attach="background" args={['#050505']} />
-      <fog attach="fog" args={['#050505', 5, 20]} />
+      <fog attach="fog" args={['#050505', 5, 25]} />
       <ambientLight intensity={0.2} />
       <pointLight position={[10, 10, 10]} intensity={1.5} color="#00ffff" />
       <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff00ff" />
       
-      <NodeGrid />
+      <group scale={responsiveScale}>
+        <NodeGrid />
+      </group>
       
       <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
       
@@ -47,13 +55,13 @@ export function App() {
   const initGame = useGameStore(s => s.initGame);
 
   useEffect(() => {
-    initGame(); // No argument = random word
+    initGame(); // No argument = daily word
   }, [initGame]);
 
   return (
     <div className="w-full h-screen bg-black overflow-hidden select-none">
       <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
+        <PerspectiveCamera makeDefault position={[0, 0, 12]} fov={50} />
         <Scene />
         <OrbitControls 
           enablePan={false} 
