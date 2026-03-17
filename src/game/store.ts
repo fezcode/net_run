@@ -20,6 +20,7 @@ interface GameState {
   isDaily: boolean;
   usedLetters: Record<string, 'correct' | 'misplaced' | 'wrong' | 'none'>;
   glitchActive: boolean;
+  detectionLevel: number; // 0 to 100
   
   // Actions
   initGame: (word?: string, forcePractice?: boolean) => void;
@@ -51,6 +52,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   isDaily: true,
   usedLetters: {},
   glitchActive: false,
+  detectionLevel: 0,
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
@@ -66,7 +68,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       timer: 300,
       isDaily,
       usedLetters: {},
-      glitchActive: false
+      glitchActive: false,
+      detectionLevel: 0
     });
   },
 
@@ -90,7 +93,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   submitGuess: () => {
-    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters, triggerGlitch } = get();
+    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters, triggerGlitch, detectionLevel } = get();
     if (gameStatus !== 'hacking') return;
     
     if (currentInput.length !== targetWord.length) {
@@ -105,31 +108,35 @@ export const useGameStore = create<GameState>((set, get) => ({
       return;
     }
 
-    // Precise Wordle logic for duplicate letters
     const targetArr = targetWord.split('');
     const inputArr = currentInput.split('');
     const result: NodeStatus[] = Array(5).fill(null).map((_, i) => ({ letter: inputArr[i], status: 'wrong' }));
     const targetCharCount: Record<string, number> = {};
 
-    // First pass: find all "correct" matches
     targetArr.forEach((char, i) => {
       if (inputArr[i] === char) {
         result[i].status = 'correct';
-        targetArr[i] = ''; // Mark as used
+        targetArr[i] = ''; 
       } else {
         targetCharCount[char] = (targetCharCount[char] || 0) + 1;
       }
     });
 
-    // Second pass: find all "misplaced" matches
+    let wrongCount = 0;
     inputArr.forEach((char, i) => {
-      if (result[i].status !== 'correct' && targetCharCount[char] > 0) {
-        result[i].status = 'misplaced';
-        targetCharCount[char]--;
+      if (result[i].status !== 'correct') {
+        if (targetCharCount[char] > 0) {
+          result[i].status = 'misplaced';
+          targetCharCount[char]--;
+        } else {
+          wrongCount++;
+        }
       }
     });
 
-    // Update keyboard mapping
+    // Detection logic: 5% per wrong letter
+    const newDetection = Math.min(100, detectionLevel + (wrongCount * 5));
+
     const newUsedLetters = { ...usedLetters };
     result.forEach(({ letter, status }) => {
       const currentStatus = newUsedLetters[letter];
@@ -150,14 +157,24 @@ export const useGameStore = create<GameState>((set, get) => ({
         guesses: newGuesses,
         gameStatus: 'success',
         message: 'ENCRYPTION BYPASSED. ACCESS GRANTED.',
-        usedLetters: newUsedLetters
+        usedLetters: newUsedLetters,
+        detectionLevel: newDetection
+      });
+    } else if (newDetection >= 100) {
+      set({
+        guesses: newGuesses,
+        gameStatus: 'failed',
+        message: 'SYSTEM DETECTED. CONNECTION TERMINATED.',
+        usedLetters: newUsedLetters,
+        detectionLevel: 100
       });
     } else if (currentRow === 5) {
       set({
         guesses: newGuesses,
         gameStatus: 'failed',
         message: `TRACE COMPLETED. ACCESS DENIED. KEY: ${targetWord}`,
-        usedLetters: newUsedLetters
+        usedLetters: newUsedLetters,
+        detectionLevel: newDetection
       });
     } else {
       set({
@@ -165,7 +182,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         currentRow: currentRow + 1,
         currentInput: '',
         message: 'NODE REJECTED. RETRYING...',
-        usedLetters: newUsedLetters
+        usedLetters: newUsedLetters,
+        detectionLevel: newDetection
       });
     }
   },

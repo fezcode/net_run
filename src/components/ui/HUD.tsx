@@ -10,6 +10,7 @@ export function HUD() {
   const tickTimer = useGameStore(s => s.tickTimer);
   const initGame = useGameStore(s => s.initGame);
   const isDaily = useGameStore(s => s.isDaily);
+  const detectionLevel = useGameStore(s => s.detectionLevel);
 
   useEffect(() => {
     const interval = setInterval(tickTimer, 1000);
@@ -42,6 +43,20 @@ export function HUD() {
             <div className={`text-xl md:text-3xl font-bold ${timer < 60 ? 'text-red-500 animate-pulse' : ''}`}>
               {formatTime(timer)}
             </div>
+          </div>
+        </div>
+
+        {/* Detection Meter */}
+        <div className="w-full flex flex-col items-center gap-1">
+          <div className="flex justify-between w-full max-w-[500px] text-[8px] md:text-[10px]">
+            <span className={detectionLevel > 70 ? 'text-red-500 animate-pulse' : 'text-cyan-500'}>DETECTION_RISK</span>
+            <span className={detectionLevel > 70 ? 'text-red-500' : 'text-cyan-500'}>{detectionLevel}%</span>
+          </div>
+          <div className="w-full max-w-[500px] h-1.5 md:h-2 bg-cyan-900/20 border border-cyan-500/30 overflow-hidden">
+            <div 
+              className={`h-full transition-all duration-500 ${detectionLevel > 70 ? 'bg-red-500 shadow-[0_0_15px_red]' : 'bg-cyan-500 shadow-[0_0_15px_cyan]'}`}
+              style={{ width: `${detectionLevel}%` }}
+            />
           </div>
         </div>
 
