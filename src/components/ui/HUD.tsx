@@ -45,13 +45,13 @@ export function HUD() {
           </div>
         </div>
 
-        {/* Status Message at TOP */}
+        {/* Status Message at TOP - Smaller Version */}
         <div className="flex justify-center">
-          <div className="bg-black/60 border border-cyan-500/30 p-3 md:p-4 min-w-[280px] md:min-w-[500px] text-center backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.1)]">
-            <div className="text-[8px] md:text-[10px] opacity-50 mb-1 h-3">
+          <div className="bg-black/60 border border-cyan-500/30 p-2 md:p-3 min-w-[200px] md:min-w-[350px] text-center backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.1)]">
+            <div className="text-[7px] md:text-[9px] opacity-50 mb-0.5 h-3">
               {gameStatus === 'hacking' ? (isIdle ? 'AWAITING INPUT...' : 'PROCESSING...') : 'TERMINAL OUTPUT'}
             </div>
-            <div className="text-sm md:text-lg tracking-widest font-bold text-white break-words">
+            <div className="text-xs md:text-sm tracking-widest font-bold text-white break-words">
               {message}
             </div>
           </div>
