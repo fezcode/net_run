@@ -179,7 +179,6 @@ export function HUD() {
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
           
-          {/* Bigger Square Help Button at Bottom Right */}
           <div className="flex items-center">
             <button 
               onClick={() => setShowHelp(true)}
@@ -225,12 +224,14 @@ export function HUD() {
             ))}
           </div>
 
-          <div className="mt-8 text-cyan-500 font-mono text-sm tracking-widest w-full flex justify-between opacity-70">
-            <span>DETECTION: {detectionLevel}%</span>
-            <span>{isDaily ? 'DAILY_MODE' : 'PRACTICE'}</span>
-          </div>
-          <div className="text-[10px] text-white/30 mt-2 font-mono">
-            ACCESS_POINT: 0x77-ALPHA // AES-256-R3F
+          <div className="mt-8 text-cyan-500 font-mono text-sm tracking-widest w-full flex justify-between opacity-70 items-center">
+            <div className="flex flex-col">
+              <span>DETECTION: {detectionLevel}%</span>
+              <span>MODE: {isDaily ? 'DAILY' : 'PRACTICE'}</span>
+            </div>
+            <div className="text-2xl font-black text-white border-l-2 border-cyan-500 pl-4">
+              {formatTime(timer)}
+            </div>
           </div>
         </div>
       </div>
