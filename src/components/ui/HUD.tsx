@@ -36,7 +36,6 @@ export function HUD() {
     return () => clearInterval(interval);
   }, [tickTimer]);
 
-  // Reset hide state when game starts
   useEffect(() => {
     if (gameStatus === 'hacking') {
       setHideGameOverModal(false);
@@ -171,8 +170,8 @@ export function HUD() {
               <div className="space-y-4 pt-4 border-t border-cyan-900/50 text-center">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
                 <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2 text-left">
-                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">ВЛАДИСЛАВ ЗАВОРИН</a> from Pixabay</div>
-                  <div>Music by <a href="..." target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:underline">Dmitrii Kolesnikov</a> from Pixabay</div>
+                  <div>Music by ВЛАДИСЛАВ ЗАВОРИН from Pixabay</div>
+                  <div>Music by Dmitrii Kolesnikov from Pixabay</div>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-xs pt-2"><span className="opacity-40 tracking-widest">DEVELOPED_BY</span><a href="https://fezcode.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 font-bold hover:text-white transition-colors">FEZCODE.COM</a></div>
               </div>
@@ -237,7 +236,6 @@ export function HUD() {
         </div>
       )}
 
-      {/* Bottom Section: Keyboard & Footer */}
       <div className="flex flex-col items-center gap-4 md:gap-6">
         <VirtualKeyboard />
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
