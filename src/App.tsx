@@ -10,9 +10,9 @@ import * as THREE from 'three';
 
 function Scene() {
   const gameStatus = useGameStore(s => s.gameStatus);
+  const glitchActive = useGameStore(s => s.glitchActive);
   const { viewport } = useThree();
   
-  // Dynamic scaling based on viewport width
   const responsiveScale = useMemo(() => {
     return Math.min(viewport.width / 6, 1);
   }, [viewport.width]);
@@ -40,12 +40,15 @@ function Scene() {
         />
         <Noise opacity={0.05} />
         <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-        <Glitch 
-          active={gameStatus === 'failed'}
-          delay={new THREE.Vector2(0.1, 0.5)} 
-          duration={new THREE.Vector2(0.1, 0.3)} 
-          strength={new THREE.Vector2(0.3, 1.0)} 
-        />
+        {(gameStatus === 'failed' || glitchActive) && (
+          <Glitch 
+            delay={new THREE.Vector2(0, 0)} 
+            duration={new THREE.Vector2(0.3, 0.6)} 
+            strength={new THREE.Vector2(0.3, 1.0)} 
+            mode={THREE.MathUtils.randInt(0, 1) as any}
+            active
+          />
+        )}
       </EffectComposer>
     </>
   );
@@ -55,7 +58,7 @@ export function App() {
   const initGame = useGameStore(s => s.initGame);
 
   useEffect(() => {
-    initGame(); // No argument = daily word
+    initGame(); 
   }, [initGame]);
 
   return (

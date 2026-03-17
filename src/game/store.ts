@@ -19,6 +19,7 @@ interface GameState {
   timer: number;
   isDaily: boolean;
   usedLetters: Record<string, 'correct' | 'misplaced' | 'wrong' | 'none'>;
+  glitchActive: boolean;
   
   // Actions
   initGame: (word?: string, forcePractice?: boolean) => void;
@@ -26,6 +27,7 @@ interface GameState {
   removeLetter: () => void;
   submitGuess: () => void;
   tickTimer: () => void;
+  triggerGlitch: () => void;
 }
 
 const getDailyWord = () => {
@@ -48,6 +50,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   timer: 300,
   isDaily: true,
   usedLetters: {},
+  glitchActive: false,
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
@@ -62,7 +65,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       message: isDaily ? 'DAILY ENCRYPTION DETECTED. BYPASSING...' : 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
       timer: 300,
       isDaily,
-      usedLetters: {}
+      usedLetters: {},
+      glitchActive: false
     });
   },
 
@@ -80,17 +84,24 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ currentInput: currentInput.slice(0, -1) });
   },
 
+  triggerGlitch: () => {
+    set({ glitchActive: true });
+    setTimeout(() => set({ glitchActive: false }), 1000);
+  },
+
   submitGuess: () => {
-    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters } = get();
+    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters, triggerGlitch } = get();
     if (gameStatus !== 'hacking') return;
     
     if (currentInput.length !== targetWord.length) {
       set({ message: 'INCOMPLETE DATA PACKET.' });
+      triggerGlitch();
       return;
     }
 
     if (!sgbWords.includes(currentInput.toLowerCase())) {
       set({ message: 'INVALID DATA STRING. REJECTED.' });
+      triggerGlitch();
       return;
     }
 
@@ -100,7 +111,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       if (letter === targetWord[i]) status = 'correct';
       else if (targetWord.includes(letter)) status = 'misplaced';
       
-      // Update keyboard mapping
       const currentStatus = newUsedLetters[letter];
       if (status === 'correct' || currentStatus !== 'correct') {
         if (status === 'correct' || currentStatus !== 'misplaced' || status === 'misplaced') {
