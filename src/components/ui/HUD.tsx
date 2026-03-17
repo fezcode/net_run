@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
+import { HelpCircle, X } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -15,6 +16,7 @@ export function HUD() {
   const guesses = useGameStore(s => s.guesses);
   const currentRow = useGameStore(s => s.currentRow);
 
+  const [showHelp, setShowHelp] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,8 +54,14 @@ export function HUD() {
         <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
           <div className="space-y-1">
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
-            <div className="text-[10px] md:text-xs opacity-70 flex flex-col md:flex-row md:gap-2">
+            <div className="text-[10px] md:text-xs opacity-70 flex items-center gap-2">
               <span>TERMINAL: 0x77-ALPHA</span>
+              <button 
+                onClick={() => setShowHelp(true)}
+                className="pointer-events-auto hover:text-white transition-colors cursor-pointer"
+              >
+                <HelpCircle size={14} />
+              </button>
               {isDaily && <span className="text-yellow-500 font-bold animate-pulse">[DAILY_SEQUENCE]</span>}
             </div>
           </div>
@@ -91,6 +99,54 @@ export function HUD() {
           </div>
         </div>
       </div>
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowHelp(false)} />
+          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)]">
+            <button 
+              onClick={() => setShowHelp(false)}
+              className="absolute top-4 right-4 text-cyan-500 hover:text-white cursor-pointer"
+            >
+              <X size={24} />
+            </button>
+            
+            <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">HOW_TO_BYPASS</div>
+            
+            <div className="space-y-4 text-sm md:text-base lowercase font-light tracking-tight text-cyan-100/80">
+              <p><span className="text-white font-bold uppercase tracking-wider underline">The Goal:</span> Guess the 5-letter encryption key in 6 attempts.</p>
+              
+              <div className="space-y-2 py-4 border-y border-cyan-900/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-500 border border-green-400" />
+                  <span>Correct letter in the correct node.</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-yellow-500 border border-yellow-400" />
+                  <span>Correct letter in the wrong node.</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-zinc-800 border border-zinc-700" />
+                  <span>Letter does not exist in sequence.</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-red-900/20 border border-red-500/30">
+                <p className="text-red-400 font-bold uppercase text-xs mb-1">Warning: Detection Meter</p>
+                <p className="text-xs">Each wrong letter increases detection by 5%. Reaching 100% terminates connection immediately.</p>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowHelp(false)}
+              className="mt-8 w-full bg-cyan-500 text-black py-3 font-bold hover:bg-white transition-colors cursor-pointer"
+            >
+              UNDERSTOOD
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Middle Section: Game Over Actions */}
       <div className="flex flex-col items-center justify-center flex-1">
@@ -142,9 +198,9 @@ export function HUD() {
           className="bg-[#050505] p-10 flex flex-col items-center gap-6 border-4 border-cyan-500/30"
           style={{ width: '500px' }}
         >
-          <div className="text-3xl font-black text-white tracking-[0.3em] mb-4 border-b-2 border-cyan-500 pb-2 w-full text-center flex flex-col gap-1">
+          <div className="text-3xl font-black text-white tracking-[0.3em] mb-4 border-b-2 border-cyan-500 pb-2 w-full text-center flex flex-col gap-2">
             <div>NET_RUN // LOG</div>
-            {isDaily && <div className="text-[10px] tracking-[0.5em] text-cyan-500 opacity-80">{new Date().toISOString().split('T')[0]}</div>}
+            {isDaily && <div className="text-lg tracking-[0.4em] text-cyan-500 font-bold bg-cyan-950/30 py-1">{new Date().toISOString().split('T')[0]}</div>}
           </div>
           
           <div className="grid gap-3">
