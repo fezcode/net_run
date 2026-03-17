@@ -71,8 +71,8 @@ npm run deploy
 ## 📜 credits
 
 -   **Music**: 
-    -   *Space Ambient* by [Владислав Заворин](https://pixabay.com/tr/users/%D0%B2%D0%BB%D0%B0%D0%B4%D0%B8%D1%81%D0%BB%D0%B0%D0%B2_%D0%B7%D0%B0%D0%B2%D0%BE%D1%80%D0%B8%D0%BD-43127785/)
-    -   *Space* by [Dmitrii Kolesnikov](https://pixabay.com/tr/users/the_mountain-3616498/)
+    -   *Space Ambient* by Владислав Заворин
+    -   *Space* by Dmitrii Kolesnikov
 -   **Interface**: Developed by [fezcode.com](https://fezcode.com)
 
 ---
