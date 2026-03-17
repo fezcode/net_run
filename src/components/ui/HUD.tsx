@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink, Keyboard } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -17,6 +17,8 @@ export function HUD() {
   const currentRow = useGameStore(s => s.currentRow);
   const musicEnabled = useGameStore(s => s.musicEnabled);
   const toggleMusic = useGameStore(s => s.toggleMusic);
+  const typingSoundsEnabled = useGameStore(s => s.typingSoundsEnabled);
+  const toggleTypingSounds = useGameStore(s => s.toggleTypingSounds);
 
   const [showHelp, setShowHelp] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -147,7 +149,7 @@ export function HUD() {
             
             <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">SYSTEM_OPTIONS</div>
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
                 <div className="flex items-center gap-3 text-white font-bold">
                   {musicEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
@@ -158,6 +160,19 @@ export function HUD() {
                   className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${musicEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}
                 >
                   <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${musicEnabled ? 'translate-x-6' : ''}`} />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+                <div className="flex items-center gap-3 text-white font-bold">
+                  <Keyboard size={20} />
+                  <span>TYPING_SENSORS</span>
+                </div>
+                <button 
+                  onClick={toggleTypingSounds}
+                  className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${typingSoundsEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}
+                >
+                  <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${typingSoundsEnabled ? 'translate-x-6' : ''}`} />
                 </button>
               </div>
 
@@ -214,7 +229,7 @@ export function HUD() {
              
              <div className="flex flex-col sm:flex-row gap-3 w-full">
                <button 
-                 className="pointer-events-auto bg-white text-black px-6 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
+                 className="pointer-events-auto bg-white text-black px-6 md:px-8 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
                  onClick={handleShare}
                >
                  DOWNLOAD_LOG
@@ -249,14 +264,12 @@ export function HUD() {
           </div>
           
           <div className="flex items-center flex-1 justify-end gap-2 md:gap-3">
-            {/* Options Button */}
             <button 
               onClick={() => setShowOptions(true)}
               className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"
             >
               <Settings size={window.innerWidth < 768 ? 20 : 28} />
             </button>
-            {/* Help Button */}
             <button 
               onClick={() => setShowHelp(true)}
               className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"

@@ -22,6 +22,7 @@ interface GameState {
   glitchActive: boolean;
   detectionLevel: number;
   musicEnabled: boolean;
+  typingSoundsEnabled: boolean;
   
   // Actions
   initGame: (word?: string, forcePractice?: boolean) => void;
@@ -31,6 +32,8 @@ interface GameState {
   tickTimer: () => void;
   triggerGlitch: () => void;
   toggleMusic: () => void;
+  toggleTypingSounds: () => void;
+  playTypingSound: () => void;
 }
 
 const getDailyWord = () => {
@@ -42,6 +45,14 @@ const getDailyWord = () => {
 const getRandomWord = () => {
   return sgbWords[Math.floor(Math.random() * sgbWords.length)].toUpperCase();
 };
+
+const typeSounds = [
+  '/button-21.mp3',
+  '/button-22.mp3',
+  '/button-23.mp3',
+  '/button-24.mp3',
+  '/button-25.mp3'
+];
 
 export const useGameStore = create<GameState>((set, get) => ({
   targetWord: 'CYBER',
@@ -55,7 +66,8 @@ export const useGameStore = create<GameState>((set, get) => ({
   usedLetters: {},
   glitchActive: false,
   detectionLevel: 0,
-  musicEnabled: true, // Enabled by default
+  musicEnabled: true,
+  typingSoundsEnabled: true,
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
@@ -76,18 +88,28 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
+  playTypingSound: () => {
+    if (!get().typingSoundsEnabled) return;
+    const soundPath = typeSounds[Math.floor(Math.random() * typeSounds.length)];
+    const audio = new Audio(soundPath);
+    audio.volume = 0.3;
+    audio.play().catch(() => {});
+  },
+
   addLetter: (letter) => {
-    const { currentInput, targetWord, gameStatus } = get();
+    const { currentInput, targetWord, gameStatus, playTypingSound } = get();
     if (gameStatus !== 'hacking') return;
     if (currentInput.length < targetWord.length) {
       set({ currentInput: currentInput + letter.toUpperCase() });
+      playTypingSound();
     }
   },
 
   removeLetter: () => {
-    const { currentInput, gameStatus } = get();
+    const { currentInput, gameStatus, playTypingSound } = get();
     if (gameStatus !== 'hacking') return;
     set({ currentInput: currentInput.slice(0, -1) });
+    playTypingSound();
   },
 
   triggerGlitch: () => {
@@ -99,10 +121,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     set((state) => ({ musicEnabled: !state.musicEnabled }));
   },
 
+  toggleTypingSounds: () => {
+    set((state) => ({ typingSoundsEnabled: !state.typingSoundsEnabled }));
+  },
+
   submitGuess: () => {
-    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters, triggerGlitch, detectionLevel } = get();
+    const { currentInput, targetWord, currentRow, guesses, gameStatus, usedLetters, triggerGlitch, detectionLevel, playTypingSound } = get();
     if (gameStatus !== 'hacking') return;
     
+    playTypingSound();
+
     if (currentInput.length !== targetWord.length) {
       set({ message: 'INCOMPLETE DATA PACKET.' });
       triggerGlitch();
