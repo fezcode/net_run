@@ -20,7 +20,8 @@ interface GameState {
   isDaily: boolean;
   usedLetters: Record<string, 'correct' | 'misplaced' | 'wrong' | 'none'>;
   glitchActive: boolean;
-  detectionLevel: number; // 0 to 100
+  detectionLevel: number;
+  musicEnabled: boolean;
   
   // Actions
   initGame: (word?: string, forcePractice?: boolean) => void;
@@ -29,12 +30,13 @@ interface GameState {
   submitGuess: () => void;
   tickTimer: () => void;
   triggerGlitch: () => void;
+  toggleMusic: () => void;
 }
 
 const getDailyWord = () => {
   const today = new Date().toISOString().split('T')[0];
   const word = (answers as Record<string, string>)[today];
-  return word ? word.toUpperCase() : 'CYBER'; // Fallback
+  return word ? word.toUpperCase() : 'CYBER';
 };
 
 const getRandomWord = () => {
@@ -53,6 +55,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   usedLetters: {},
   glitchActive: false,
   detectionLevel: 0,
+  musicEnabled: true, // Enabled by default
 
   initGame: (word, forcePractice) => {
     const isDaily = !word && !forcePractice;
@@ -60,7 +63,7 @@ export const useGameStore = create<GameState>((set, get) => ({
     
     set({
       targetWord: finalWord,
-      guesses: Array(6).fill(null).map(() => Array(finalWord.length).fill({ letter: '', status: 'none' })),
+      guesses: Array(6).fill(null).map(() => Array(5).fill({ letter: '', status: 'none' })),
       currentRow: 0,
       currentInput: '',
       gameStatus: 'hacking',
@@ -90,6 +93,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   triggerGlitch: () => {
     set({ glitchActive: true });
     setTimeout(() => set({ glitchActive: false }), 1000);
+  },
+
+  toggleMusic: () => {
+    set((state) => ({ musicEnabled: !state.musicEnabled }));
   },
 
   submitGuess: () => {
@@ -134,7 +141,6 @@ export const useGameStore = create<GameState>((set, get) => ({
       }
     });
 
-    // Detection logic: 5% per wrong letter
     const newDetection = Math.min(100, detectionLevel + (wrongCount * 5));
 
     const newUsedLetters = { ...usedLetters };

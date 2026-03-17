@@ -4,6 +4,7 @@ import { Bloom, EffectComposer, Noise, ChromaticAberration, Glitch } from '@reac
 import { NodeGrid } from './components/environment/NodeGrid';
 import { HUD } from './components/ui/HUD';
 import { KeyboardHandler } from './components/ui/KeyboardHandler';
+import { AudioPlayer } from './components/ui/AudioPlayer';
 import { useGameStore } from './game/store';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
@@ -75,6 +76,7 @@ export function App() {
       </Canvas>
       <HUD />
       <KeyboardHandler />
+      <AudioPlayer />
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useGameStore } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, ExternalLink } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -15,8 +15,11 @@ export function HUD() {
   const detectionLevel = useGameStore(s => s.detectionLevel);
   const guesses = useGameStore(s => s.guesses);
   const currentRow = useGameStore(s => s.currentRow);
+  const musicEnabled = useGameStore(s => s.musicEnabled);
+  const toggleMusic = useGameStore(s => s.toggleMusic);
 
   const [showHelp, setShowHelp] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const shareRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -130,6 +133,79 @@ export function HUD() {
         </div>
       )}
 
+      {/* Options Modal */}
+      {showOptions && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowOptions(false)} />
+          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)]">
+            <button 
+              onClick={() => setShowOptions(false)}
+              className="absolute top-4 right-4 text-cyan-500 hover:text-white cursor-pointer"
+            >
+              <X size={24} />
+            </button>
+            
+            <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">SYSTEM_OPTIONS</div>
+            
+            <div className="space-y-6">
+              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+                <div className="flex items-center gap-3 text-white font-bold">
+                  {musicEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                  <span>BACKGROUND_AUDIO</span>
+                </div>
+                <button 
+                  onClick={toggleMusic}
+                  className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${musicEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}
+                >
+                  <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${musicEnabled ? 'translate-x-6' : ''}`} />
+                </button>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-cyan-900/50">
+                <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
+                
+                <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60">
+                  Music by <a 
+                    href="https://pixabay.com/tr/users/владислав_заворин-43127785/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                  >
+                    ВЛАДИСЛАВ / VLADISLAV ЗАВОРИН / ZAVORIN <ExternalLink size={8} />
+                  </a> from <a 
+                    href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=433363" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-cyan-400 hover:underline inline-flex items-center gap-0.5"
+                  >
+                    Pixabay <ExternalLink size={8} />
+                  </a>
+                </div>
+
+                <div className="flex items-center justify-center gap-2 text-xs">
+                  <span className="opacity-40 tracking-widest">DEVELOPED_BY</span>
+                  <a 
+                    href="https://fezcode.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="text-cyan-400 font-bold hover:text-white transition-colors"
+                  >
+                    FEZCODE.COM
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={() => setShowOptions(false)}
+              className="mt-8 w-full bg-cyan-500 text-black py-3 font-bold hover:bg-white transition-colors cursor-pointer"
+            >
+              EXIT_OPTIONS
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Middle Section: Game Over Actions */}
       <div className="flex flex-col items-center justify-center flex-1">
         {isGameOver && (
@@ -138,13 +214,13 @@ export function HUD() {
              
              <div className="flex flex-col sm:flex-row gap-3 w-full">
                <button 
-                 className="pointer-events-auto bg-white text-black px-6 md:px-8 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
+                 className="pointer-events-auto bg-white text-black px-6 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center"
                  onClick={handleShare}
                >
                  DOWNLOAD_LOG
                </button>
                <button 
-                 className="pointer-events-auto bg-cyan-500 text-black px-6 md:px-8 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center"
+                 className="pointer-events-auto bg-cyan-500 text-black px-6 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center"
                  onClick={() => initGame(undefined, true)} 
                >
                  NEW_INSTANCE
@@ -159,7 +235,6 @@ export function HUD() {
         <VirtualKeyboard />
 
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
-          {/* Relocated Message Box content to Left of Footer */}
           <div className="flex-1 flex flex-col justify-end h-full max-w-[40%]">
             <div className="text-[7px] md:text-[9px] opacity-50 mb-0.5 uppercase">
               {gameStatus === 'hacking' ? (isIdle ? 'AWAITING INPUT...' : 'PROCESSING...') : 'TERMINAL OUTPUT'}
@@ -173,7 +248,15 @@ export function HUD() {
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
           
-          <div className="flex items-center flex-1 justify-end">
+          <div className="flex items-center flex-1 justify-end gap-2 md:gap-3">
+            {/* Options Button */}
+            <button 
+              onClick={() => setShowOptions(true)}
+              className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+            >
+              <Settings size={window.innerWidth < 768 ? 20 : 28} />
+            </button>
+            {/* Help Button */}
             <button 
               onClick={() => setShowHelp(true)}
               className="pointer-events-auto w-10 h-10 md:w-14 md:h-14 bg-cyan-950/30 border border-cyan-500/50 hover:bg-cyan-500 hover:text-black transition-all cursor-pointer flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]"
