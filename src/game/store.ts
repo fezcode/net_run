@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { sgbWords } from './words';
 
 export type GameStatus = 'idle' | 'hacking' | 'success' | 'failed';
 
@@ -17,31 +18,38 @@ interface GameState {
   timer: number;
   
   // Actions
-  initGame: (word: string) => void;
+  initGame: (word?: string) => void;
   addLetter: (letter: string) => void;
   removeLetter: () => void;
   submitGuess: () => void;
   tickTimer: () => void;
 }
 
+const getRandomWord = () => {
+  return sgbWords[Math.floor(Math.random() * sgbWords.length)].toUpperCase();
+};
+
 export const useGameStore = create<GameState>((set, get) => ({
-  targetWord: 'HACKER',
-  guesses: Array(6).fill(null).map(() => Array(6).fill({ letter: '', status: 'none' })),
+  targetWord: 'CYBER',
+  guesses: Array(6).fill(null).map(() => Array(5).fill({ letter: '', status: 'none' })),
   currentRow: 0,
   currentInput: '',
   gameStatus: 'idle',
   message: 'SYSTEM READY. INITIATE HACK...',
   timer: 300, // 5 minutes
 
-  initGame: (word) => set({
-    targetWord: word.toUpperCase(),
-    guesses: Array(6).fill(null).map(() => Array(word.length).fill({ letter: '', status: 'none' })),
-    currentRow: 0,
-    currentInput: '',
-    gameStatus: 'hacking',
-    message: 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
-    timer: 300,
-  }),
+  initGame: (word) => {
+    const finalWord = word ? word.toUpperCase() : getRandomWord();
+    set({
+      targetWord: finalWord,
+      guesses: Array(6).fill(null).map(() => Array(finalWord.length).fill({ letter: '', status: 'none' })),
+      currentRow: 0,
+      currentInput: '',
+      gameStatus: 'hacking',
+      message: 'CONNECTION ESTABLISHED. BYPASS ENCRYPTION.',
+      timer: 300,
+    });
+  },
 
   addLetter: (letter) => {
     const { currentInput, targetWord, gameStatus } = get();
@@ -60,8 +68,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   submitGuess: () => {
     const { currentInput, targetWord, currentRow, guesses, gameStatus } = get();
     if (gameStatus !== 'hacking') return;
+    
     if (currentInput.length !== targetWord.length) {
       set({ message: 'INCOMPLETE DATA PACKET.' });
+      return;
+    }
+
+    if (!sgbWords.includes(currentInput.toLowerCase())) {
+      set({ message: 'INVALID DATA STRING. REJECTED.' });
       return;
     }
 

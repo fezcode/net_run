@@ -15,6 +15,7 @@ export function NodeGrid() {
             const isCurrentRow = rowIndex === currentRow;
             const letter = isCurrentRow ? currentInput[colIndex] || '' : node.letter;
             const status = isCurrentRow ? 'none' : node.status;
+            const isCurrentFocus = isCurrentRow && colIndex === currentInput.length;
 
             return (
               <NodeCube
@@ -22,6 +23,7 @@ export function NodeGrid() {
                 letter={letter}
                 status={status}
                 position={[colIndex * 1.2, 0, 0]}
+                isCurrentFocus={isCurrentFocus}
               />
             );
           })}

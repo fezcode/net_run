@@ -47,7 +47,7 @@ export function App() {
   const initGame = useGameStore(s => s.initGame);
 
   useEffect(() => {
-    initGame('NETRUN'); // Initial word
+    initGame(); // No argument = random word
   }, [initGame]);
 
   return (
