@@ -40,15 +40,13 @@ function Scene() {
         />
         <Noise opacity={0.05} />
         <ChromaticAberration offset={new THREE.Vector2(0.002, 0.002)} />
-        {(gameStatus === 'failed' || glitchActive) && (
-          <Glitch 
-            delay={new THREE.Vector2(0, 0)} 
-            duration={new THREE.Vector2(0.3, 0.6)} 
-            strength={new THREE.Vector2(0.3, 1.0)} 
-            mode={THREE.MathUtils.randInt(0, 1) as any}
-            active
-          />
-        )}
+        <Glitch 
+          delay={new THREE.Vector2(0, 0)} 
+          duration={new THREE.Vector2(0.3, 0.6)} 
+          strength={new THREE.Vector2(0.3, 1.0)} 
+          mode={1}
+          active={glitchActive || gameStatus === 'failed'}
+        />
       </EffectComposer>
     </>
   );
