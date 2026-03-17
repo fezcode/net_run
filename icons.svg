@@ -1,0 +1,9 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#050505"/>
+  <rect x="64" y="64" width="384" height="384" stroke="#00ffff" stroke-width="20"/>
+  <path d="M64 160H128M384 352H448M160 64V128M352 384V448" stroke="#00ffff" stroke-width="10"/>
+  <rect x="192" y="192" width="128" height="128" fill="#00ffff" fill-opacity="0.3">
+    <animate attributeName="fill-opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite" />
+  </rect>
+  <path d="M128 128L384 384M384 128L128 384" stroke="#00ffff" stroke-width="5" stroke-opacity="0.2"/>
+</svg>
