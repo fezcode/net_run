@@ -282,8 +282,13 @@ export function HUD() {
                   return (
                     <div 
                       key={j} 
-                      className={`w-12 h-12 border-2 ${color}`} 
-                      style={{ marginRight: j < row.length - 1 ? '12px' : '0' }}
+                      className={`border-2 ${color}`} 
+                      style={{ 
+                        width: '48px', 
+                        height: '48px', 
+                        marginRight: j < row.length - 1 ? '12px' : '0',
+                        flexShrink: 0
+                      }}
                     />
                   );
                 })}
