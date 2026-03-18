@@ -10,7 +10,7 @@ export function NodeGrid() {
   const gameStatus = useGameStore(s => s.gameStatus);
   const { viewport } = useThree();
 
-  const isMobile = viewport.width < 10;
+  const isMobile = window.innerWidth < 768;
   const spacing = isMobile ? 0.9 : 1.2;
   const cubeScale = isMobile ? 0.75 : 1;
 
