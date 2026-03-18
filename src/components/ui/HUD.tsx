@@ -95,8 +95,8 @@ export function HUD() {
 
   return (
     <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 pb-2 md:pb-8 font-mono text-cyan-500 uppercase overflow-hidden">
-      {/* Top Section: Header & Detection */}
-      <div className="space-y-4">
+      {/* Top Section: Header & Detection (Hidden on Mobile) */}
+      <div className="space-y-4 hidden md:block">
         <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
           <div className="space-y-1">
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
@@ -126,6 +126,9 @@ export function HUD() {
           </div>
         </div>
       </div>
+
+      {/* Spacer for mobile to push content down if needed, but flex-col justify-between handles it */}
+      <div className="md:hidden" />
 
       {/* Help Modal */}
       {showHelp && (
@@ -244,6 +247,9 @@ export function HUD() {
             <div className="text-[10px] md:text-sm tracking-widest font-bold text-white break-words line-clamp-2">{message}</div>
           </div>
           <div className="flex flex-col items-center gap-1 opacity-40 px-2 flex-1 text-center">
+            <div className={`text-sm font-bold md:hidden ${timer < 60 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+              {formatTime(timer)}
+            </div>
             <div className="text-[6px] md:text-[8px]">AES-256-R3F | PROTOCOL: DAILY-WORD-V1</div>
           </div>
           <div className="flex items-center flex-1 justify-end gap-2 md:gap-3">
