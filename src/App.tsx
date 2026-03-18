@@ -19,7 +19,7 @@ function Scene() {
   }, [viewport.width]);
 
   const responsivePosition = useMemo(() => {
-    return viewport.width < 6 ? new THREE.Vector3(0, 1.5, 0) : new THREE.Vector3(0, 0, 0);
+    return viewport.width < 6 ? new THREE.Vector3(0, 2.5, 0) : new THREE.Vector3(0, 0, 0);
   }, [viewport.width]);
 
   return (
