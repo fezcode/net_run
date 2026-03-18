@@ -24,8 +24,8 @@ function Scene() {
       // Plus half a cube height at 0.75 scale: 0.9 * 0.75 / 2 = 0.3375
       // Total top edge = 2.5875 relative to NodeGrid center
       const gridTopOffset = 2.5875 * responsiveScale;
-      // Subtract a small margin (e.g. 0.2) to "almost touch" but not overlap
-      return new THREE.Vector3(0, (viewport.height / 2) - gridTopOffset - 0.2, 0);
+      // Subtract a larger margin (0.8 instead of 0.2) to move it "a little down"
+      return new THREE.Vector3(0, (viewport.height / 2) - gridTopOffset - 0.8, 0);
     }
     return new THREE.Vector3(0, 0, 0);
   }, [viewport.width, viewport.height, responsiveScale]);
