@@ -19,8 +19,14 @@ function Scene() {
   }, [viewport.width]);
 
   const responsivePosition = useMemo(() => {
-    return viewport.width < 6 ? new THREE.Vector3(0, 2.5, 0) : new THREE.Vector3(0, 0, 0);
-  }, [viewport.width]);
+    if (viewport.width < 6) {
+      // On mobile, the top edge of the grid is at ~2.5875 units above its center (at scale 1)
+      // We calculate the Y position to make this top edge align with the top of the viewport
+      const gridTopOffset = 2.5875 * responsiveScale;
+      return new THREE.Vector3(0, (viewport.height / 2) - gridTopOffset, 0);
+    }
+    return new THREE.Vector3(0, 0, 0);
+  }, [viewport.width, viewport.height, responsiveScale]);
 
   return (
     <>
