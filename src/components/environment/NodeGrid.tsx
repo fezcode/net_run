@@ -1,4 +1,3 @@
-import { useThree } from '@react-three/fiber';
 import { useGameStore } from '../../game/store';
 import { NodeCube } from '../entities/NodeCube';
 
@@ -8,7 +7,6 @@ export function NodeGrid() {
   const currentInput = useGameStore(s => s.currentInput);
   const targetWord = useGameStore(s => s.targetWord);
   const gameStatus = useGameStore(s => s.gameStatus);
-  const { viewport } = useThree();
 
   const isMobile = window.innerWidth < 768;
   const spacing = isMobile ? 0.9 : 1.2;
