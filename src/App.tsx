@@ -18,6 +18,10 @@ function Scene() {
     return Math.min(viewport.width / 6, 1);
   }, [viewport.width]);
 
+  const responsivePosition = useMemo(() => {
+    return viewport.width < 6 ? new THREE.Vector3(0, 1.5, 0) : new THREE.Vector3(0, 0, 0);
+  }, [viewport.width]);
+
   return (
     <>
       <color attach="background" args={['#050505']} />
@@ -26,7 +30,7 @@ function Scene() {
       <pointLight position={[10, 10, 10]} intensity={1.5} color="#00ffff" />
       <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff00ff" />
       
-      <group scale={responsiveScale}>
+      <group scale={responsiveScale} position={responsivePosition}>
         <NodeGrid />
       </group>
       

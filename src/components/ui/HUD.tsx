@@ -94,7 +94,7 @@ export function HUD() {
   }
 
   return (
-    <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 font-mono text-cyan-500 uppercase overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 pb-2 md:pb-8 font-mono text-cyan-500 uppercase overflow-hidden">
       {/* Top Section: Header & Detection */}
       <div className="space-y-4">
         <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
@@ -236,7 +236,7 @@ export function HUD() {
         </div>
       )}
 
-      <div className="flex flex-col items-center gap-4 md:gap-6">
+      <div className="flex flex-col-reverse md:flex-col items-center gap-4 md:gap-6">
         <VirtualKeyboard />
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
           <div className="flex-1 flex flex-col justify-end h-full max-w-[40%]">
