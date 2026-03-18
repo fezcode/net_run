@@ -95,9 +95,10 @@ export function HUD() {
 
   return (
     <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 pb-2 md:pb-8 font-mono text-cyan-500 uppercase overflow-hidden">
-      {/* Top Section: Header & Detection (Hidden on Mobile) */}
-      <div className="space-y-4 hidden md:block">
-        <div className="flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
+      {/* Top Section: Header & Detection */}
+      <div className="flex flex-col">
+        {/* Header (Hidden on Mobile) */}
+        <div className="hidden md:flex justify-between items-start border-b border-cyan-900/50 pb-2 md:pb-4 bg-black/20 backdrop-blur-sm">
           <div className="space-y-1">
             <div className="text-lg md:text-2xl font-bold tracking-widest text-white">NET_RUN v1.0.4</div>
             <div className="text-[10px] md:text-xs opacity-70 flex flex-col md:flex-row md:gap-2">
@@ -113,7 +114,8 @@ export function HUD() {
           </div>
         </div>
 
-        <div className="w-full flex flex-col items-center gap-1">
+        {/* Detection Meter (Visible on both, positioned below cubes on mobile) */}
+        <div className="w-full flex flex-col items-center gap-1 mt-[52vh] md:mt-4 px-6 md:px-0">
           <div className="flex justify-between w-full max-w-[500px] text-[8px] md:text-[10px]">
             <span className={detectionLevel > 70 ? 'text-red-500 animate-pulse' : 'text-cyan-500'}>DETECTION_RISK</span>
             <span className={detectionLevel > 70 ? 'text-red-500' : 'text-cyan-500'}>{detectionLevel}%</span>
@@ -126,9 +128,6 @@ export function HUD() {
           </div>
         </div>
       </div>
-
-      {/* Spacer for mobile to push content down if needed, but flex-col justify-between handles it */}
-      <div className="md:hidden" />
 
       {/* Help Modal */}
       {showHelp && (
