@@ -114,8 +114,8 @@ export function HUD() {
           </div>
         </div>
 
-        {/* Detection Meter (Visible on both, positioned below cubes on mobile) */}
-        <div className="w-full flex flex-col items-center gap-1 mt-[52vh] md:mt-4 px-6 md:px-0">
+        {/* Detection Meter (Visible on both, positioned at the top on mobile) */}
+        <div className="w-full flex flex-col items-center gap-1 mt-2 md:mt-4 px-6 md:px-0">
           <div className="flex justify-between w-full max-w-[500px] text-[8px] md:text-[10px]">
             <span className={detectionLevel > 70 ? 'text-red-500 animate-pulse' : 'text-cyan-500'}>DETECTION_RISK</span>
             <span className={detectionLevel > 70 ? 'text-red-500' : 'text-cyan-500'}>{detectionLevel}%</span>
