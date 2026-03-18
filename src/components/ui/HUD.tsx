@@ -263,14 +263,34 @@ export function HUD() {
       </div>
 
       <div className="fixed left-[-9999px] top-0">
-        <div ref={shareRef} className="bg-[#050505] p-10 flex flex-col items-center gap-6 border-4 border-cyan-500/30" style={{ width: '500px' }}>
-          <div className="text-3xl font-black text-white tracking-[0.3em] mb-4 border-b-2 border-cyan-500 pb-2 w-full text-center flex flex-col gap-2">
+        <div 
+          ref={shareRef} 
+          className="bg-[#050505] border-4 border-cyan-500/30" 
+          style={{ 
+            width: '500px', 
+            padding: '40px', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div 
+            className="text-3xl font-black text-white tracking-[0.3em] border-b-2 border-cyan-500 text-center flex flex-col"
+            style={{ width: '100%', paddingBottom: '8px', marginBottom: '24px', gap: '8px' }}
+          >
             <div>NET_RUN // LOG</div>
             {isDaily && <div className="text-lg tracking-[0.4em] text-cyan-500 font-bold bg-cyan-950/30 py-1">{new Date().toISOString().split('T')[0]}</div>}
           </div>
-          <div className="flex flex-col">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {guesses.map((row, i) => (
-              <div key={i} className="flex" style={{ marginBottom: i < guesses.length - 1 ? '12px' : '0' }}>
+              <div 
+                key={i} 
+                style={{ 
+                  display: 'flex', 
+                  marginBottom: i < guesses.length - 1 ? '12px' : '0' 
+                }}
+              >
                 {row.map((node, j) => {
                   const isSubmitted = i < currentRow || (isGameOver && node.status !== 'none');
                   let color = 'bg-[#111] border-white/5';
@@ -286,8 +306,13 @@ export function HUD() {
                       style={{ 
                         width: '48px', 
                         height: '48px', 
+                        minWidth: '48px',
+                        maxWidth: '48px',
+                        minHeight: '48px',
+                        maxHeight: '48px',
                         marginRight: j < row.length - 1 ? '12px' : '0',
-                        flexShrink: 0
+                        flexShrink: 0,
+                        boxSizing: 'border-box'
                       }}
                     />
                   );
@@ -295,7 +320,10 @@ export function HUD() {
               </div>
             ))}
           </div>
-          <div className="mt-8 text-cyan-500 font-mono text-sm tracking-widest w-full flex justify-between opacity-70 items-center">
+          <div 
+            className="text-cyan-500 font-mono text-sm tracking-widest opacity-70 flex justify-between items-center"
+            style={{ width: '100%', marginTop: '32px' }}
+          >
             <div className="flex flex-col"><span>DETECTION: {detectionLevel}%</span><span>MODE: {isDaily ? 'DAILY' : 'PRACTICE'}</span></div>
             <div className="text-2xl font-black text-white border-l-2 border-cyan-500 pl-4">{formatTime(timer)}</div>
           </div>
