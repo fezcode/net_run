@@ -268,9 +268,9 @@ export function HUD() {
             <div>NET_RUN // LOG</div>
             {isDaily && <div className="text-lg tracking-[0.4em] text-cyan-500 font-bold bg-cyan-950/30 py-1">{new Date().toISOString().split('T')[0]}</div>}
           </div>
-          <div className="grid gap-3">
+          <div className="flex flex-col">
             {guesses.map((row, i) => (
-              <div key={i} className="flex gap-3">
+              <div key={i} className="flex" style={{ marginBottom: i < guesses.length - 1 ? '12px' : '0' }}>
                 {row.map((node, j) => {
                   const isSubmitted = i < currentRow || (isGameOver && node.status !== 'none');
                   let color = 'bg-[#111] border-white/5';
@@ -279,7 +279,13 @@ export function HUD() {
                     else if (node.status === 'misplaced') color = 'bg-[#ffff00] shadow-[0_0_15px_#ffff00]';
                     else if (node.status === 'wrong') color = 'bg-[#333]';
                   }
-                  return <div key={j} className={`w-12 h-12 border-2 ${color} transition-all`} />;
+                  return (
+                    <div 
+                      key={j} 
+                      className={`w-12 h-12 border-2 ${color}`} 
+                      style={{ marginRight: j < row.length - 1 ? '12px' : '0' }}
+                    />
+                  );
                 })}
               </div>
             ))}
