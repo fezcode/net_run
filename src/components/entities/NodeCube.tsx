@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, Float, MeshWobbleMaterial } from '@react-three/drei';
 import * as THREE from 'three';
+import { useGameStore, getColorScheme } from '../../game/store';
 
 interface NodeCubeProps {
   letter: string;
@@ -13,15 +14,14 @@ interface NodeCubeProps {
 export function NodeCube({ letter, status, position, isCurrentFocus }: NodeCubeProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const cursorRef = useRef<THREE.Mesh>(null);
+  const colorBlindMode = useGameStore(s => s.colorBlindMode);
 
-  const colors = {
-    none: '#888', 
-    correct: '#00ff00',
-    misplaced: '#ffff00',
-    wrong: '#ff0000',
-  };
+  const colors = getColorScheme(colorBlindMode);
 
-  const statusColor = colors[status];
+  let statusColor = '#888';
+  if (status === 'correct') statusColor = colors.correct.hexShadow;
+  else if (status === 'misplaced') statusColor = colors.misplaced.hexShadow;
+  else if (status === 'wrong') statusColor = colors.wrong.hexShadow;
 
   useFrame((state) => {
     if (meshRef.current) {

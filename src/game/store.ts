@@ -4,6 +4,7 @@ import { sgbWords } from './words';
 import answers from './answers.json';
 
 export type GameStatus = 'idle' | 'hacking' | 'success' | 'failed';
+export type ColorBlindMode = 'normal' | 'protanopia' | 'deuteranopia' | 'tritanopia';
 
 interface NodeStatus {
   letter: string;
@@ -34,6 +35,7 @@ interface GameState {
   musicEnabled: boolean;
   typingSoundsEnabled: boolean;
   virtualKeyboardEnabled: boolean;
+  colorBlindMode: ColorBlindMode;
   isStarted: boolean;
   history: Record<string, HistoryEntry>;
   
@@ -48,6 +50,7 @@ interface GameState {
   toggleMusic: () => void;
   toggleTypingSounds: () => void;
   toggleVirtualKeyboard: () => void;
+  setColorBlindMode: (mode: ColorBlindMode) => void;
   playTypingSound: () => void;
   clearHistory: () => void;
 }
@@ -87,6 +90,7 @@ export const useGameStore = create<GameState>()(
       musicEnabled: true,
       typingSoundsEnabled: true,
       virtualKeyboardEnabled: true,
+      colorBlindMode: 'normal',
       isStarted: false,
       history: {},
 
@@ -141,6 +145,10 @@ export const useGameStore = create<GameState>()(
         if (gameStatus !== 'hacking') return;
         set({ currentInput: currentInput.slice(0, -1) });
         playTypingSound();
+      },
+
+      setColorBlindMode: (mode) => {
+        set({ colorBlindMode: mode });
       },
 
       triggerGlitch: () => {
@@ -296,8 +304,33 @@ export const useGameStore = create<GameState>()(
         musicEnabled: state.musicEnabled,
         typingSoundsEnabled: state.typingSoundsEnabled,
         virtualKeyboardEnabled: state.virtualKeyboardEnabled,
+        colorBlindMode: state.colorBlindMode,
         history: state.history
       }),
     }
   )
 );
+
+export const getColorScheme = (mode: ColorBlindMode) => {
+  switch (mode) {
+    case 'protanopia':
+    case 'deuteranopia':
+      return {
+        correct: { hex: '#3b82f6', tw: 'bg-blue-500', borderTw: 'border-blue-400', textTw: 'text-blue-500', shadowTw: 'rgba(59,130,246,0.5)', hexShadow: '#3b82f6' }, // Blue
+        misplaced: { hex: '#eab308', tw: 'bg-yellow-500', borderTw: 'border-yellow-400', textTw: 'text-yellow-500', shadowTw: 'rgba(234,179,8,0.5)', hexShadow: '#eab308' }, // Yellow
+        wrong: { hex: '#27272a', tw: 'bg-zinc-800', borderTw: 'border-zinc-700', textTw: 'text-gray-500', hexShadow: '#27272a' } // Dark gray
+      };
+    case 'tritanopia':
+      return {
+        correct: { hex: '#ef4444', tw: 'bg-red-500', borderTw: 'border-red-400', textTw: 'text-red-500', shadowTw: 'rgba(239,68,68,0.5)', hexShadow: '#ef4444' }, // Red
+        misplaced: { hex: '#06b6d4', tw: 'bg-cyan-500', borderTw: 'border-cyan-400', textTw: 'text-cyan-500', shadowTw: 'rgba(6,182,212,0.5)', hexShadow: '#06b6d4' }, // Cyan
+        wrong: { hex: '#27272a', tw: 'bg-zinc-800', borderTw: 'border-zinc-700', textTw: 'text-gray-500', hexShadow: '#27272a' } // Dark gray
+      };
+    default: // normal
+      return {
+        correct: { hex: '#22c55e', tw: 'bg-green-500', borderTw: 'border-green-400', textTw: 'text-green-500', shadowTw: 'rgba(34,197,94,0.5)', hexShadow: '#00ff00' }, // Green
+        misplaced: { hex: '#eab308', tw: 'bg-yellow-500', borderTw: 'border-yellow-400', textTw: 'text-yellow-500', shadowTw: 'rgba(234,179,8,0.5)', hexShadow: '#ffff00' }, // Yellow
+        wrong: { hex: '#27272a', tw: 'bg-zinc-800', borderTw: 'border-zinc-700', textTw: 'text-gray-500', hexShadow: '#333333' } // Dark gray
+      };
+  }
+};

@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGameStore } from '../../game/store';
+import { useGameStore, getColorScheme } from '../../game/store';
 import type { HistoryEntry } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, Keyboard, Play, History, Trash2, LayoutPanelTop } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, Keyboard, Play, History, Trash2, LayoutPanelTop, Eye } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -22,10 +22,14 @@ export function HUD() {
   const toggleTypingSounds = useGameStore(s => s.toggleTypingSounds);
   const virtualKeyboardEnabled = useGameStore(s => s.virtualKeyboardEnabled);
   const toggleVirtualKeyboard = useGameStore(s => s.toggleVirtualKeyboard);
+  const colorBlindMode = useGameStore(s => s.colorBlindMode);
+  const setColorBlindMode = useGameStore(s => s.setColorBlindMode);
   const isStarted = useGameStore(s => s.isStarted);
   const startGame = useGameStore(s => s.startGame);
   const history = useGameStore(s => s.history);
   const clearHistory = useGameStore(s => s.clearHistory);
+
+  const colors = getColorScheme(colorBlindMode);
 
   const [showHelp, setShowHelp] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -141,8 +145,8 @@ export function HUD() {
             <div className="space-y-4 text-sm md:text-base lowercase font-light tracking-tight text-cyan-100/80">
               <p><span className="text-white font-bold uppercase tracking-wider underline">The Goal:</span> Guess the 5-letter encryption key in 6 attempts.</p>
               <div className="space-y-2 py-4 border-y border-cyan-900/50">
-                <div className="flex items-center gap-3"><div className="w-6 h-6 bg-green-500 border border-green-400" /><span>Correct letter in the correct node.</span></div>
-                <div className="flex items-center gap-3"><div className="w-6 h-6 bg-yellow-500 border border-yellow-400" /><span>Correct letter in the wrong node.</span></div>
+                <div className="flex items-center gap-3"><div className={`w-6 h-6 ${colors.correct.tw} border ${colors.correct.borderTw}`} /><span>Correct letter in the correct node.</span></div>
+                <div className="flex items-center gap-3"><div className={`w-6 h-6 ${colors.misplaced.tw} border ${colors.misplaced.borderTw}`} /><span>Correct letter in the wrong node.</span></div>
                 <div className="flex items-center gap-3"><div className="w-6 h-6 bg-zinc-800 border border-zinc-700" /><span>Letter does not exist in sequence.</span></div>
               </div>
               <div className="p-3 bg-red-900/20 border border-red-500/30">
@@ -174,6 +178,19 @@ export function HUD() {
               <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
                 <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>VIRTUAL_KEYBOARD</span></div>
                 <button onClick={toggleVirtualKeyboard} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${virtualKeyboardEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${virtualKeyboardEnabled ? 'translate-x-6' : ''}`} /></button>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+                <div className="flex items-center gap-3 text-white font-bold"><Eye size={20} /><span>COLOR_BLIND_MODE</span></div>
+                <select 
+                  value={colorBlindMode} 
+                  onChange={(e) => setColorBlindMode(e.target.value as any)}
+                  className="pointer-events-auto bg-black text-cyan-500 border border-cyan-500/50 px-2 py-1 text-xs font-bold focus:outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                >
+                  <option value="normal">NORMAL</option>
+                  <option value="protanopia">PROTANOPIA</option>
+                  <option value="deuteranopia">DEUTERANOPIA</option>
+                  <option value="tritanopia">TRITANOPIA</option>
+                </select>
               </div>
               <div className="space-y-4 pt-4 border-t border-cyan-900/50 text-center">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
@@ -218,7 +235,7 @@ export function HUD() {
                         <div className="text-[10px] opacity-50">TIME</div>
                         <div className="text-xs font-bold text-white">{formatTime(entry.timer)}</div>
                       </div>
-                      <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? 'bg-green-500 text-black' : 'bg-red-500 text-black'}`}>{entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}</div>
+                      <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? `${colors.correct.tw} text-black` : 'bg-red-500 text-black'}`}>{entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}</div>
                     </div>
                   </div>
                 ))
@@ -299,16 +316,16 @@ export function HUD() {
               >
                 {row.map((node, j) => {
                   const isSubmitted = i < currentRow || (isGameOver && node.status !== 'none');
-                  let color = 'bg-[#111] border-white/5';
+                  let colorStyle = { backgroundColor: '#111', borderColor: 'rgba(255,255,255,0.05)', boxShadow: 'none' };
                   if (isSubmitted) {
-                    if (node.status === 'correct') color = 'bg-[#00ff00] shadow-[0_0_15px_#00ff00]';
-                    else if (node.status === 'misplaced') color = 'bg-[#ffff00] shadow-[0_0_15px_#ffff00]';
-                    else if (node.status === 'wrong') color = 'bg-[#333]';
+                    if (node.status === 'correct') colorStyle = { backgroundColor: colors.correct.hex, borderColor: colors.correct.hex, boxShadow: `0 0 15px ${colors.correct.shadowTw}` };
+                    else if (node.status === 'misplaced') colorStyle = { backgroundColor: colors.misplaced.hex, borderColor: colors.misplaced.hex, boxShadow: `0 0 15px ${colors.misplaced.shadowTw}` };
+                    else if (node.status === 'wrong') colorStyle = { backgroundColor: '#333', borderColor: '#333', boxShadow: 'none' };
                   }
                   return (
                     <div 
                       key={j} 
-                      className={`border-2 ${color}`} 
+                      className="border-2" 
                       style={{ 
                         width: '48px', 
                         height: '48px', 
@@ -318,7 +335,8 @@ export function HUD() {
                         maxHeight: '48px',
                         marginRight: j < row.length - 1 ? '12px' : '0',
                         flexShrink: 0,
-                        boxSizing: 'border-box'
+                        boxSizing: 'border-box',
+                        ...colorStyle
                       }}
                     />
                   );

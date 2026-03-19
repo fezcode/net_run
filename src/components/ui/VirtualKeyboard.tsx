@@ -1,4 +1,4 @@
-import { useGameStore } from '../../game/store';
+import { useGameStore, getColorScheme } from '../../game/store';
 
 const ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -12,6 +12,9 @@ export function VirtualKeyboard() {
   const submitGuess = useGameStore(s => s.submitGuess);
   const usedLetters = useGameStore(s => s.usedLetters);
   const gameStatus = useGameStore(s => s.gameStatus);
+  const colorBlindMode = useGameStore(s => s.colorBlindMode);
+
+  const colors = getColorScheme(colorBlindMode);
 
   const handleClick = (key: string) => {
     if (gameStatus !== 'hacking') return;
@@ -22,9 +25,9 @@ export function VirtualKeyboard() {
 
   const getKeyColor = (key: string) => {
     const status = usedLetters[key];
-    if (status === 'correct') return 'bg-green-500 text-black border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)]';
-    if (status === 'misplaced') return 'bg-yellow-500 text-black border-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.5)]';
-    if (status === 'wrong') return 'bg-zinc-800 text-gray-500 border-zinc-700 opacity-50';
+    if (status === 'correct') return `${colors.correct.tw} text-black ${colors.correct.borderTw} shadow-[0_0_15px_${colors.correct.shadowTw}]`;
+    if (status === 'misplaced') return `${colors.misplaced.tw} text-black ${colors.misplaced.borderTw} shadow-[0_0_15px_${colors.misplaced.shadowTw}]`;
+    if (status === 'wrong') return `${colors.wrong.tw} ${colors.wrong.textTw} ${colors.wrong.borderTw} opacity-50`;
     return 'bg-black/40 text-cyan-400 border-cyan-900/50 hover:border-cyan-400/50 hover:bg-cyan-900/20';
   };
 
