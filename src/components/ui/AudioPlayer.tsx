@@ -8,8 +8,20 @@ const PLAYLIST = [
 
 export function AudioPlayer() {
   const musicEnabled = useGameStore(s => s.musicEnabled);
+  const isStarted = useGameStore(s => s.isStarted);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrackIndex = useRef(Math.floor(Math.random() * PLAYLIST.length));
+
+  // Pre-load all tracks when session is initiated
+  useEffect(() => {
+    if (isStarted) {
+      PLAYLIST.forEach(track => {
+        const audio = new Audio(track);
+        audio.preload = 'auto';
+        audio.load();
+      });
+    }
+  }, [isStarted]);
 
   const playNext = () => {
     if (!audioRef.current) return;

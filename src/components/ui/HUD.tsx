@@ -20,6 +20,8 @@ export function HUD() {
   const toggleMusic = useGameStore(s => s.toggleMusic);
   const typingSoundsEnabled = useGameStore(s => s.typingSoundsEnabled);
   const toggleTypingSounds = useGameStore(s => s.toggleTypingSounds);
+  const virtualKeyboardEnabled = useGameStore(s => s.virtualKeyboardEnabled);
+  const toggleVirtualKeyboard = useGameStore(s => s.toggleVirtualKeyboard);
   const isStarted = useGameStore(s => s.isStarted);
   const startGame = useGameStore(s => s.startGame);
   const history = useGameStore(s => s.history);
@@ -169,6 +171,10 @@ export function HUD() {
                 <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>TYPING_SENSORS</span></div>
                 <button onClick={toggleTypingSounds} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${typingSoundsEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${typingSoundsEnabled ? 'translate-x-6' : ''}`} /></button>
               </div>
+              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+                <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>VIRTUAL_KEYBOARD</span></div>
+                <button onClick={toggleVirtualKeyboard} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${virtualKeyboardEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${virtualKeyboardEnabled ? 'translate-x-6' : ''}`} /></button>
+              </div>
               <div className="space-y-4 pt-4 border-t border-cyan-900/50 text-center">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
                 <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2 text-left">
@@ -239,7 +245,7 @@ export function HUD() {
       )}
 
       <div className="flex flex-col-reverse md:flex-col items-center gap-4 md:gap-6">
-        <VirtualKeyboard />
+        {virtualKeyboardEnabled && <VirtualKeyboard />}
         <div className="flex justify-between items-end border-t border-cyan-900/50 pt-2 md:pt-4 bg-black/20 backdrop-blur-sm w-full">
           <div className="flex-1 flex flex-col justify-end h-full max-w-[40%]">
             <div className="text-[7px] md:text-[9px] opacity-50 mb-0.5 uppercase">{gameStatus === 'hacking' ? (isIdle ? 'AWAITING INPUT...' : 'PROCESSING...') : 'TERMINAL OUTPUT'}</div>

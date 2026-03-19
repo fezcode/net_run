@@ -12,23 +12,38 @@ import * as THREE from 'three';
 function Scene() {
   const gameStatus = useGameStore(s => s.gameStatus);
   const glitchActive = useGameStore(s => s.glitchActive);
+  const virtualKeyboardEnabled = useGameStore(s => s.virtualKeyboardEnabled);
   const { viewport } = useThree();
+
+  const isMobile = window.innerWidth < 768;
+  const spacing = isMobile ? 0.9 : 1.2;
+  const gridWidth = 5 * spacing;
+  const gridHeight = 6 * spacing;
+
+  // Estimated margins in Three.js units
+  const topMargin = isMobile ? 1.4 : 2.2;
+  const bottomMargin = isMobile 
+    ? (virtualKeyboardEnabled ? 3.8 : 1.8) 
+    : (virtualKeyboardEnabled ? 3.2 : 1.8);
+
+  const availableHeight = viewport.height - topMargin - bottomMargin;
+  const availableWidth = viewport.width - 1.0;
   
   const responsiveScale = useMemo(() => {
-    return Math.min(viewport.width / 6, 1);
-  }, [viewport.width]);
+    const scaleW = availableWidth / gridWidth;
+    const scaleH = availableHeight / gridHeight;
+    return Math.min(scaleW, scaleH, 1.0);
+  }, [availableWidth, availableHeight, gridWidth, gridHeight]);
 
   const responsivePosition = useMemo(() => {
-    if (window.innerWidth < 768) {
-      // Top row center is at (6-1) * (0.9/2) = 2.25
-      // Plus half a cube height at 0.75 scale: 0.9 * 0.75 / 2 = 0.3375
-      // Total top edge = 2.5875 relative to NodeGrid center
-      const gridTopOffset = 2.5875 * responsiveScale;
-      // Subtract a larger margin (1.2 instead of 0.8) to push it down below the new top-meter
-      return new THREE.Vector3(0, (viewport.height / 2) - gridTopOffset - 1.2, 0);
-    }
-    return new THREE.Vector3(0, 0, 0);
-  }, [viewport.width, viewport.height, responsiveScale]);
+    // Top boundary is viewport.height/2 - topMargin
+    // Bottom boundary is -viewport.height/2 + bottomMargin
+    // Center point between these boundaries:
+    const topLimit = viewport.height / 2 - topMargin;
+    const bottomLimit = -viewport.height / 2 + bottomMargin;
+    const center = (topLimit + bottomLimit) / 2;
+    return new THREE.Vector3(0, center, 0);
+  }, [viewport.height, topMargin, bottomMargin]);
 
   return (
     <>

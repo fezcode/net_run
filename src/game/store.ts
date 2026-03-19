@@ -33,6 +33,7 @@ interface GameState {
   detectionLevel: number;
   musicEnabled: boolean;
   typingSoundsEnabled: boolean;
+  virtualKeyboardEnabled: boolean;
   isStarted: boolean;
   history: Record<string, HistoryEntry>;
   
@@ -46,6 +47,7 @@ interface GameState {
   triggerGlitch: () => void;
   toggleMusic: () => void;
   toggleTypingSounds: () => void;
+  toggleVirtualKeyboard: () => void;
   playTypingSound: () => void;
   clearHistory: () => void;
 }
@@ -84,10 +86,19 @@ export const useGameStore = create<GameState>()(
       detectionLevel: 0,
       musicEnabled: true,
       typingSoundsEnabled: true,
+      virtualKeyboardEnabled: true,
       isStarted: false,
       history: {},
 
-      startGame: () => set({ isStarted: true }),
+      startGame: () => {
+        // Pre-load all button sounds for immediate playback
+        typeSounds.forEach(sound => {
+          const audio = new Audio(sound);
+          audio.preload = 'auto';
+          audio.load();
+        });
+        set({ isStarted: true });
+      },
 
       initGame: (word, forcePractice) => {
         const isDaily = !word && !forcePractice;
@@ -143,6 +154,10 @@ export const useGameStore = create<GameState>()(
 
       toggleTypingSounds: () => {
         set((state) => ({ typingSoundsEnabled: !state.typingSoundsEnabled }));
+      },
+
+      toggleVirtualKeyboard: () => {
+        set((state) => ({ virtualKeyboardEnabled: !state.virtualKeyboardEnabled }));
       },
 
       clearHistory: () => {
@@ -265,8 +280,8 @@ export const useGameStore = create<GameState>()(
       },
 
       tickTimer: () => {
-        const { timer, gameStatus } = get();
-        if (gameStatus !== 'hacking') return;
+        const { timer, gameStatus, isStarted } = get();
+        if (!isStarted || gameStatus !== 'hacking') return;
         if (timer <= 0) {
           set({ gameStatus: 'failed', message: 'CONNECTION TIMEOUT. TRACE COMPLETE.' });
         } else {
@@ -280,6 +295,7 @@ export const useGameStore = create<GameState>()(
       partialize: (state) => ({
         musicEnabled: state.musicEnabled,
         typingSoundsEnabled: state.typingSoundsEnabled,
+        virtualKeyboardEnabled: state.virtualKeyboardEnabled,
         history: state.history
       }),
     }
