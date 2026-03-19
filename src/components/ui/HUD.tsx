@@ -147,7 +147,7 @@ export function HUD() {
               <div className="space-y-2 py-4 border-y border-cyan-900/50">
                 <div className="flex items-center gap-3"><div className={`w-6 h-6 ${colors.correct.tw} border ${colors.correct.borderTw}`} /><span>Correct letter in the correct node.</span></div>
                 <div className="flex items-center gap-3"><div className={`w-6 h-6 ${colors.misplaced.tw} border ${colors.misplaced.borderTw}`} /><span>Correct letter in the wrong node.</span></div>
-                <div className="flex items-center gap-3"><div className="w-6 h-6 bg-zinc-800 border border-zinc-700" /><span>Letter does not exist in sequence.</span></div>
+                <div className="flex items-center gap-3"><div className={`w-6 h-6 ${colors.wrong.tw} border ${colors.wrong.borderTw}`} /><span>Letter does not exist in sequence.</span></div>
               </div>
               <div className="p-3 bg-red-900/20 border border-red-500/30">
                 <p className="text-red-400 font-bold uppercase text-xs mb-1">Warning: Detection Meter</p>
@@ -192,6 +192,34 @@ export function HUD() {
                   <option value="tritanopia">TRITANOPIA</option>
                 </select>
               </div>
+              
+              {/* Color Scheme Legend */}
+              <div className="p-4 bg-cyan-950/20 border border-cyan-500/30 space-y-3">
+                <div className="flex justify-between items-center">
+                  <div className="text-[10px] text-white/50 tracking-widest font-bold">SCHEME_LEGEND [{colorBlindMode.toUpperCase()}]</div>
+                  <div className="text-[8px] text-cyan-500/50 italic">
+                    {colorBlindMode === 'normal' && 'STANDARD_HIGH_CONTRAST'}
+                    {colorBlindMode === 'protanopia' && 'OPTIMIZED_FOR_RED_BLINDNESS'}
+                    {colorBlindMode === 'deuteranopia' && 'OPTIMIZED_FOR_GREEN_BLINDNESS'}
+                    {colorBlindMode === 'tritanopia' && 'OPTIMIZED_FOR_BLUE_BLINDNESS'}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 ${colors.correct.tw} border ${colors.correct.borderTw}`} />
+                    <span className="text-[10px] text-white font-bold">CORRECT_NODE // CORRECT POSITION</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 ${colors.misplaced.tw} border ${colors.misplaced.borderTw}`} />
+                    <span className="text-[10px] text-white font-bold">MISPLACED_NODE // WRONG POSITION</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-4 h-4 ${colors.wrong.tw} border ${colors.wrong.borderTw}`} />
+                    <span className="text-[10px] text-white font-bold">WRONG_NODE // NOT IN SEQUENCE</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-4 pt-4 border-t border-cyan-900/50 text-center">
                 <div className="text-[10px] text-cyan-500/60 uppercase tracking-widest">Credits</div>
                 <div className="bg-black/40 p-3 border border-cyan-900/30 text-[10px] lowercase leading-relaxed text-cyan-100/60 space-y-2 text-left">
@@ -320,7 +348,7 @@ export function HUD() {
                   if (isSubmitted) {
                     if (node.status === 'correct') colorStyle = { backgroundColor: colors.correct.hex, borderColor: colors.correct.hex, boxShadow: `0 0 15px ${colors.correct.shadowTw}` };
                     else if (node.status === 'misplaced') colorStyle = { backgroundColor: colors.misplaced.hex, borderColor: colors.misplaced.hex, boxShadow: `0 0 15px ${colors.misplaced.shadowTw}` };
-                    else if (node.status === 'wrong') colorStyle = { backgroundColor: '#333', borderColor: '#333', boxShadow: 'none' };
+                    else if (node.status === 'wrong') colorStyle = { backgroundColor: colors.wrong.hex, borderColor: colors.wrong.hex, boxShadow: 'none' };
                   }
                   return (
                     <div 

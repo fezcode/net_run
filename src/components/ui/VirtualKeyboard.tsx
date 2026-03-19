@@ -27,7 +27,7 @@ export function VirtualKeyboard() {
     const status = usedLetters[key];
     if (status === 'correct') return `${colors.correct.tw} text-black ${colors.correct.borderTw} shadow-[0_0_15px_${colors.correct.shadowTw}]`;
     if (status === 'misplaced') return `${colors.misplaced.tw} text-black ${colors.misplaced.borderTw} shadow-[0_0_15px_${colors.misplaced.shadowTw}]`;
-    if (status === 'wrong') return `${colors.wrong.tw} ${colors.wrong.textTw} ${colors.wrong.borderTw} opacity-50`;
+    if (status === 'wrong') return `${colors.wrong.tw} text-black ${colors.wrong.borderTw}`;
     return 'bg-black/40 text-cyan-400 border-cyan-900/50 hover:border-cyan-400/50 hover:bg-cyan-900/20';
   };
 
