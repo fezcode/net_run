@@ -139,8 +139,8 @@ export function HUD() {
       {showHelp && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowHelp(false)} />
-          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)]">
-            <button onClick={() => setShowHelp(false)} className="absolute top-4 right-4 text-cyan-500 hover:text-white cursor-pointer"><X size={24} /></button>
+          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)] custom-scrollbar">
+            <button onClick={() => setShowHelp(false)} className="sticky top-0 float-right -mt-2 -mr-2 text-cyan-500 hover:text-white cursor-pointer z-10 bg-black/50 backdrop-blur-sm p-1"><X size={24} /></button>
             <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">HOW_TO_BYPASS</div>
             <div className="space-y-4 text-sm md:text-base lowercase font-light tracking-tight text-cyan-100/80">
               <p><span className="text-white font-bold uppercase tracking-wider underline">The Goal:</span> Guess the 5-letter encryption key in 6 attempts.</p>
@@ -163,28 +163,28 @@ export function HUD() {
       {showOptions && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowOptions(false)} />
-          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)]">
-            <button onClick={() => setShowOptions(false)} className="absolute top-4 right-4 text-cyan-500 hover:text-white cursor-pointer"><X size={24} /></button>
+          <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)] custom-scrollbar">
+            <button onClick={() => setShowOptions(false)} className="sticky top-0 float-right -mt-2 -mr-2 text-cyan-500 hover:text-white cursor-pointer z-10 bg-black/50 backdrop-blur-sm p-1"><X size={24} /></button>
             <div className="text-2xl font-black mb-6 border-b border-cyan-900 pb-2 tracking-widest">SYSTEM_OPTIONS</div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30 gap-3">
                 <div className="flex items-center gap-3 text-white font-bold">{musicEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}<span>BACKGROUND_AUDIO</span></div>
                 <button onClick={toggleMusic} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${musicEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${musicEnabled ? 'translate-x-6' : ''}`} /></button>
               </div>
-              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30 gap-3">
                 <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>TYPING_SENSORS</span></div>
                 <button onClick={toggleTypingSounds} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${typingSoundsEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${typingSoundsEnabled ? 'translate-x-6' : ''}`} /></button>
               </div>
-              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30 gap-3">
                 <div className="flex items-center gap-3 text-white font-bold"><Keyboard size={20} /><span>VIRTUAL_KEYBOARD</span></div>
                 <button onClick={toggleVirtualKeyboard} className={`pointer-events-auto w-12 h-6 rounded-full transition-colors relative ${virtualKeyboardEnabled ? 'bg-cyan-500' : 'bg-zinc-800'}`}><div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${virtualKeyboardEnabled ? 'translate-x-6' : ''}`} /></button>
               </div>
-              <div className="flex items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-cyan-950/20 border border-cyan-500/30 gap-3">
                 <div className="flex items-center gap-3 text-white font-bold"><Eye size={20} /><span>COLOR_BLIND_MODE</span></div>
                 <select 
                   value={colorBlindMode} 
                   onChange={(e) => setColorBlindMode(e.target.value as any)}
-                  className="pointer-events-auto bg-black text-cyan-500 border border-cyan-500/50 px-2 py-1 text-xs font-bold focus:outline-none focus:border-cyan-500 appearance-none cursor-pointer"
+                  className="pointer-events-auto bg-black text-cyan-500 border border-cyan-500/50 px-2 py-1 text-xs font-bold focus:outline-none focus:border-cyan-500 cursor-pointer min-w-[120px]"
                 >
                   <option value="normal">NORMAL</option>
                   <option value="protanopia">PROTANOPIA</option>
