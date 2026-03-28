@@ -7,6 +7,8 @@ export function NodeGrid() {
   const currentInput = useGameStore(s => s.currentInput);
   const targetWord = useGameStore(s => s.targetWord);
   const gameStatus = useGameStore(s => s.gameStatus);
+  const activeICE = useGameStore(s => s.activeICE);
+  const phantomColumn = useGameStore(s => s.phantomColumn);
 
   const isMobile = window.innerWidth < 768;
   const spacing = isMobile ? 0.9 : 1.2;
@@ -21,6 +23,7 @@ export function NodeGrid() {
             const letter = isCurrentRow ? currentInput[colIndex] || '' : node.letter;
             const status = isCurrentRow ? 'none' : node.status;
             const isCurrentFocus = isCurrentRow && colIndex === currentInput.length;
+            const isPhantom = activeICE.includes('PHANTOM_NODE') && colIndex === phantomColumn && !isCurrentRow;
 
             return (
               <group key={`${rowIndex}-${colIndex}`} scale={cubeScale}>
@@ -29,6 +32,7 @@ export function NodeGrid() {
                   status={status}
                   position={[colIndex * (spacing / cubeScale), 0, 0]}
                   isCurrentFocus={isCurrentFocus}
+                  isPhantom={isPhantom}
                 />
               </group>
             );

@@ -9,23 +9,35 @@ interface NodeCubeProps {
   status: 'none' | 'correct' | 'misplaced' | 'wrong';
   position: [number, number, number];
   isCurrentFocus?: boolean;
+  isPhantom?: boolean;
 }
 
-export function NodeCube({ letter, status, position, isCurrentFocus }: NodeCubeProps) {
+export function NodeCube({ letter, status, position, isCurrentFocus, isPhantom }: NodeCubeProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const cursorRef = useRef<THREE.Mesh>(null);
   const colorBlindMode = useGameStore(s => s.colorBlindMode);
 
   const colors = getColorScheme(colorBlindMode);
 
+  const isRevealed = status !== 'none';
+  const showPhantom = isPhantom && isRevealed;
+
   let statusColor = '#888';
-  if (status === 'correct') statusColor = colors.correct.hexShadow;
-  else if (status === 'misplaced') statusColor = colors.misplaced.hexShadow;
-  else if (status === 'wrong') statusColor = colors.wrong.hexShadow;
+  if (showPhantom) {
+    statusColor = '#a855f7'; // encrypted purple
+  } else if (status === 'correct') {
+    statusColor = colors.correct.hexShadow;
+  } else if (status === 'misplaced') {
+    statusColor = colors.misplaced.hexShadow;
+  } else if (status === 'wrong') {
+    statusColor = colors.wrong.hexShadow;
+  }
+
+  const displayLetter = showPhantom ? '?' : letter;
 
   useFrame((state) => {
     if (meshRef.current) {
-      if (status !== 'none') {
+      if (isRevealed) {
         meshRef.current.rotation.y = THREE.MathUtils.lerp(
           meshRef.current.rotation.y,
           Math.PI * 2,
@@ -40,19 +52,19 @@ export function NodeCube({ letter, status, position, isCurrentFocus }: NodeCubeP
   });
 
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+    <Float speed={showPhantom ? 4 : 2} rotationIntensity={showPhantom ? 1.0 : 0.5} floatIntensity={0.5}>
       <group position={position}>
         <mesh ref={meshRef}>
           <boxGeometry args={[0.9, 0.9, 0.9]} />
           <MeshWobbleMaterial
             color={statusColor}
-            factor={status === 'none' ? 0.05 : 0.2}
-            speed={2}
-            wireframe={status === 'none'}
+            factor={showPhantom ? 0.3 : (status === 'none' ? 0.05 : 0.2)}
+            speed={showPhantom ? 4 : 2}
+            wireframe={!showPhantom && status === 'none'}
             transparent
-            opacity={status === 'none' ? 0.4 : 0.8}
+            opacity={showPhantom ? 0.6 : (status === 'none' ? 0.4 : 0.8)}
           />
-          {letter && (
+          {displayLetter && (
             <Text
               position={[0, 0, 0.51]}
               fontSize={0.6}
@@ -60,7 +72,7 @@ export function NodeCube({ letter, status, position, isCurrentFocus }: NodeCubeP
               anchorX="center"
               anchorY="middle"
             >
-              {letter}
+              {displayLetter}
             </Text>
           )}
         </mesh>

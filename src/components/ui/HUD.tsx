@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { useGameStore, getColorScheme } from '../../game/store';
+import { useGameStore, getColorScheme, ICE_MODIFIERS, getDailyICE } from '../../game/store';
 import type { HistoryEntry } from '../../game/store';
 import { VirtualKeyboard } from './VirtualKeyboard';
 import { toPng } from 'html-to-image';
-import { HelpCircle, X, Settings, Volume2, VolumeX, Keyboard, Play, History, Trash2, LayoutPanelTop, Eye } from 'lucide-react';
+import { HelpCircle, X, Settings, Volume2, VolumeX, Keyboard, Play, History, Trash2, LayoutPanelTop, Eye, Shield, ShieldAlert, Info } from 'lucide-react';
 
 export function HUD() {
   const message = useGameStore(s => s.message);
@@ -28,6 +28,11 @@ export function HUD() {
   const startGame = useGameStore(s => s.startGame);
   const history = useGameStore(s => s.history);
   const clearHistory = useGameStore(s => s.clearHistory);
+  const activeICE = useGameStore(s => s.activeICE);
+  const phantomColumn = useGameStore(s => s.phantomColumn);
+  const timerDrain = useGameStore(s => s.timerDrain);
+  const practiceICESelection = useGameStore(s => s.practiceICESelection);
+  const togglePracticeICE = useGameStore(s => s.togglePracticeICE);
 
   const colors = getColorScheme(colorBlindMode);
 
@@ -35,6 +40,8 @@ export function HUD() {
   const [showOptions, setShowOptions] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [hideGameOverModal, setHideGameOverModal] = useState(false);
+  const [showPracticeSetup, setShowPracticeSetup] = useState(false);
+  const [expandedICE, setExpandedICE] = useState<string | null>(null);
   const shareRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,8 +56,8 @@ export function HUD() {
   }, [gameStatus]);
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
+    const m = Math.floor(Math.max(0, seconds) / 60);
+    const s = Math.max(0, seconds) % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
@@ -69,6 +76,40 @@ export function HUD() {
 
   const isIdle = currentInput.length === 0;
   const isGameOver = gameStatus === 'success' || gameStatus === 'failed';
+  const dailyICEPreview = getDailyICE();
+
+  // ─── ICE Badge Component ───────────────────────────────────────
+
+  const ICEBadge = ({ iceId, compact = false }: { iceId: string; compact?: boolean }) => {
+    const def = ICE_MODIFIERS.find(m => m.id === iceId);
+    if (!def) return null;
+    const isExpanded = expandedICE === iceId;
+
+    return (
+      <div className="relative">
+        <button
+          onClick={(e) => { e.stopPropagation(); setExpandedICE(isExpanded ? null : iceId); }}
+          className={`pointer-events-auto flex items-center gap-2 border transition-all cursor-pointer ${
+            compact
+              ? 'px-3 py-1.5 border-amber-500/40 bg-amber-950/30 text-amber-400 hover:bg-amber-900/40'
+              : 'px-4 py-2 border-amber-500/50 bg-amber-950/40 text-amber-400 hover:bg-amber-900/50'
+          }`}
+        >
+          <ShieldAlert size={compact ? 14 : 16} />
+          <span className={`font-black tracking-wider ${compact ? 'text-[10px] md:text-xs' : 'text-xs md:text-sm'}`}>{def.name}</span>
+          <Info size={compact ? 10 : 12} className="opacity-50" />
+        </button>
+        {isExpanded && (
+          <div className="absolute top-full left-0 mt-1 z-[100] w-64 p-3 bg-black border border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.2)] pointer-events-auto">
+            <div className="text-[10px] font-black text-amber-400 tracking-widest mb-1">{def.name}</div>
+            <div className="text-[10px] text-amber-200/70 leading-relaxed lowercase">{def.description}</div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─── START SCREEN ──────────────────────────────────────────────
 
   if (!isStarted) {
     return (
@@ -79,7 +120,40 @@ export function HUD() {
             <h1 className="text-4xl md:text-6xl font-black text-white tracking-[0.2em] animate-pulse">NET_RUN</h1>
             <p className="text-cyan-500 text-xs md:text-sm tracking-[0.4em] opacity-70">ENCRYPTION_BYPASS_INTERFACE</p>
           </div>
-          <div className="w-full h-px bg-cyan-900/50" />
+
+          {/* Daily ICE Preview */}
+          {dailyICEPreview.length > 0 ? (
+            <div className="w-full space-y-3">
+              <div className="w-full h-px bg-amber-900/50" />
+              <div className="flex items-center justify-center gap-2 text-[10px] text-amber-500 tracking-[0.3em] font-bold">
+                <Shield size={14} />
+                <span>TODAY'S ICE COUNTERMEASURES</span>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {dailyICEPreview.map(iceId => {
+                  const def = ICE_MODIFIERS.find(m => m.id === iceId);
+                  if (!def) return null;
+                  return (
+                    <div key={iceId} className="flex flex-col items-center gap-2 p-4 border border-amber-500/30 bg-amber-950/20 max-w-[250px]">
+                      <div className="flex items-center gap-2">
+                        <ShieldAlert size={16} className="text-amber-500" />
+                        <span className="text-xs font-black text-amber-400 tracking-widest">{def.name}</span>
+                      </div>
+                      <span className="text-[10px] text-amber-200/70 lowercase leading-relaxed">{def.description}</span>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="w-full h-px bg-amber-900/50" />
+            </div>
+          ) : (
+            <div className="w-full space-y-2">
+              <div className="w-full h-px bg-cyan-900/50" />
+              <div className="text-[10px] text-cyan-700 tracking-[0.3em]">NO ICE DETECTED — SECURITY MINIMAL</div>
+              <div className="w-full h-px bg-cyan-900/50" />
+            </div>
+          )}
+
           <button 
             onClick={() => startGame()}
             className="group pointer-events-auto relative px-12 py-4 bg-transparent border-2 border-cyan-500 text-cyan-500 font-bold tracking-[0.3em] overflow-hidden hover:text-black transition-colors cursor-pointer"
@@ -99,8 +173,66 @@ export function HUD() {
     );
   }
 
+  // ─── PRACTICE SETUP MODAL ─────────────────────────────────────
+
+  const PracticeSetupModal = () => (
+    <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={() => setShowPracticeSetup(false)} />
+      <div className="relative bg-black border-2 border-cyan-500 p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.3)] custom-scrollbar">
+        <button onClick={() => setShowPracticeSetup(false)} className="sticky top-0 float-right -mt-2 -mr-2 text-cyan-500 hover:text-white cursor-pointer z-10 bg-black/50 backdrop-blur-sm p-1"><X size={24} /></button>
+        
+        <div className="flex items-center gap-3 mb-2">
+          <Shield size={24} className="text-amber-500" />
+          <div className="text-2xl font-black tracking-widest text-white">ICE_LOADOUT</div>
+        </div>
+        <div className="text-[10px] text-cyan-500/60 mb-6 border-b border-cyan-900 pb-4 tracking-wider">SELECT COUNTERMEASURES FOR PRACTICE RUN. TAP TO TOGGLE.</div>
+
+        <div className="space-y-3">
+          {ICE_MODIFIERS.map(ice => {
+            const isSelected = practiceICESelection.includes(ice.id);
+            return (
+              <button
+                key={ice.id}
+                onClick={() => togglePracticeICE(ice.id)}
+                className={`w-full text-left p-4 border-2 transition-all cursor-pointer ${
+                  isSelected
+                    ? 'border-amber-500 bg-amber-950/30 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
+                    : 'border-cyan-900/30 bg-cyan-950/10 hover:border-cyan-500/50'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert size={16} className={isSelected ? 'text-amber-500' : 'text-cyan-700'} />
+                    <span className={`text-sm font-black tracking-widest ${isSelected ? 'text-amber-400' : 'text-cyan-500'}`}>{ice.name}</span>
+                  </div>
+                  <div className={`w-5 h-5 border-2 flex items-center justify-center transition-all ${
+                    isSelected ? 'border-amber-500 bg-amber-500' : 'border-cyan-700'
+                  }`}>
+                    {isSelected && <span className="text-black text-xs font-black">✓</span>}
+                  </div>
+                </div>
+                <div className="text-[10px] text-cyan-100/50 leading-relaxed lowercase pl-6">{ice.description}</div>
+                <div className={`mt-2 text-[8px] font-bold tracking-[0.2em] pl-6 ${isSelected ? 'text-amber-500/70' : 'text-cyan-700/50'}`}>{ice.shortDesc}</div>
+              </button>
+            );
+          })}
+        </div>
+
+        <button 
+          onClick={() => { initGame(undefined, true); setShowPracticeSetup(false); }}
+          className="mt-6 w-full bg-cyan-500 text-black py-4 font-black tracking-[0.2em] hover:bg-white transition-colors cursor-pointer text-lg flex items-center justify-center gap-3"
+        >
+          <Play size={20} fill="currentColor" />
+          {practiceICESelection.length > 0 ? `START_HACK // ${practiceICESelection.length} ICE` : 'START_HACK // NO ICE'}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ─── MAIN HUD ─────────────────────────────────────────────────
+
   return (
-    <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 pb-2 md:pb-8 font-mono text-cyan-500 uppercase overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none flex flex-col justify-between p-4 md:p-8 pb-2 md:pb-8 font-mono text-cyan-500 uppercase overflow-hidden" onClick={() => setExpandedICE(null)}>
       {/* Top Section: Header & Detection */}
       <div className="flex flex-col">
         {/* Header (Hidden on Mobile) */}
@@ -117,10 +249,22 @@ export function HUD() {
             <div className={`text-xl md:text-3xl font-bold ${timer < 60 ? 'text-red-500 animate-pulse' : ''}`}>
               {formatTime(timer)}
             </div>
+            {activeICE.includes('ENTROPY_DECAY') && timerDrain > 1 && (
+              <div className="text-[8px] text-amber-500 font-bold animate-pulse">DRAIN ×{timerDrain}</div>
+            )}
           </div>
         </div>
 
-        {/* Detection Meter (Visible on both, positioned at the top on mobile) */}
+        {/* Active ICE Badges */}
+        {activeICE.length > 0 && (
+          <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2">
+            {activeICE.map(iceId => (
+              <ICEBadge key={iceId} iceId={iceId} compact />
+            ))}
+          </div>
+        )}
+
+        {/* Detection Meter */}
         <div className="w-full flex flex-col items-center gap-1 mt-2 md:mt-4 px-6 md:px-0">
           <div className="flex justify-between w-full max-w-[500px] text-[8px] md:text-[10px]">
             <span className={detectionLevel > 70 ? 'text-red-500 animate-pulse' : 'text-cyan-500'}>DETECTION_RISK</span>
@@ -152,6 +296,25 @@ export function HUD() {
               <div className="p-3 bg-red-900/20 border border-red-500/30">
                 <p className="text-red-400 font-bold uppercase text-xs mb-1">Warning: Detection Meter</p>
                 <p className="text-xs">Each wrong letter increases detection by 5%. Reaching 100% terminates connection immediately.</p>
+              </div>
+
+              {/* ICE Modifier Explanations */}
+              <div className="p-4 bg-amber-950/20 border border-amber-500/30 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Shield size={16} className="text-amber-500" />
+                  <p className="text-amber-400 font-bold uppercase text-xs">ICE COUNTERMEASURES</p>
+                </div>
+                <p className="text-xs text-amber-200/60">ICE (Intrusion Countermeasure Electronics) are security modifiers that change the rules of each hack. Daily sequences have forced ICE. Practice mode lets you choose.</p>
+                <div className="space-y-2">
+                  {ICE_MODIFIERS.map(ice => (
+                    <div key={ice.id} className="flex items-start gap-2 pl-2 border-l-2 border-amber-500/30">
+                      <div>
+                        <div className="text-[10px] font-black text-amber-400 tracking-wider">{ice.name}</div>
+                        <div className="text-[9px] text-amber-200/50 leading-relaxed">{ice.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <button onClick={() => setShowHelp(false)} className="mt-8 w-full bg-cyan-500 text-black py-3 font-bold hover:bg-white transition-colors cursor-pointer">UNDERSTOOD</button>
@@ -249,22 +412,30 @@ export function HUD() {
             <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
               {Object.keys(history).length === 0 ? (<div className="text-center py-10 opacity-40 italic">NO_LOGS_FOUND_IN_BUFFER</div>) : (
                 Object.values(history).sort((a, b) => b.date.localeCompare(a.date)).map((entry: HistoryEntry) => (
-                  <div key={entry.date} className="flex items-center justify-between p-3 bg-cyan-950/10 border border-cyan-900/30 hover:border-cyan-500/50 transition-colors">
-                    <div className="space-y-1">
-                      <div className="text-xs text-white font-bold">{entry.date}</div>
-                      <div className="text-[10px] opacity-60">TARGET: {entry.status === 'success' ? entry.word : 'XXXXX'}</div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <div className="text-[10px] opacity-50">DETECTION</div>
-                        <div className={`text-xs font-bold ${entry.detectionLevel > 70 ? 'text-red-500' : 'text-cyan-500'}`}>{entry.detectionLevel}%</div>
+                  <div key={entry.date} className="flex flex-col p-3 bg-cyan-950/10 border border-cyan-900/30 hover:border-cyan-500/50 transition-colors gap-2">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="text-xs text-white font-bold">{entry.date}</div>
+                        <div className="text-[10px] opacity-60">TARGET: {entry.word}</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-[10px] opacity-50">TIME</div>
-                        <div className="text-xs font-bold text-white">{formatTime(entry.timer)}</div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                          <div className="text-[10px] opacity-50">DETECTION</div>
+                          <div className={`text-xs font-bold ${entry.detectionLevel > 70 ? 'text-red-500' : 'text-cyan-500'}`}>{entry.detectionLevel}%</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[10px] opacity-50">TIME</div>
+                          <div className="text-xs font-bold text-white">{formatTime(entry.timer)}</div>
+                        </div>
+                        <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? `${colors.correct.tw} text-black` : 'bg-red-500 text-black'}`}>{entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}</div>
                       </div>
-                      <div className={`px-3 py-1 text-[10px] font-black ${entry.status === 'success' ? `${colors.correct.tw} text-black` : 'bg-red-500 text-black'}`}>{entry.status === 'success' ? 'BYPASSED' : 'TERMINATED'}</div>
                     </div>
+                    {entry.activeICE && entry.activeICE.length > 0 && (
+                      <div className="flex items-center gap-1.5 pt-1 border-t border-cyan-900/20">
+                        <ShieldAlert size={10} className="text-amber-500/60" />
+                        <span className="text-[8px] text-amber-400/60 font-bold tracking-wider">{entry.activeICE.join(' | ')}</span>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
@@ -273,6 +444,9 @@ export function HUD() {
           </div>
         </div>
       )}
+
+      {/* Practice Setup Modal */}
+      {showPracticeSetup && <PracticeSetupModal />}
 
       {/* Game Over Modal */}
       {isGameOver && !hideGameOverModal && (
@@ -283,7 +457,7 @@ export function HUD() {
              <div className="text-white text-xs md:text-sm font-bold tracking-[0.2em] mb-2">HACK_SEQUENCE_TERMINATED</div>
              <div className="flex flex-col sm:flex-row gap-3 w-full">
                <button className="pointer-events-auto bg-white text-black px-6 py-3 font-black hover:bg-cyan-400 transition-colors cursor-pointer shadow-[0_0_20px_rgba(255,255,255,0.2)] flex-1 text-center" onClick={handleShare}>DOWNLOAD_LOG</button>
-               <button className="pointer-events-auto bg-cyan-500 text-black px-6 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center" onClick={() => initGame(undefined, true)}>NEW_INSTANCE</button>
+               <button className="pointer-events-auto bg-cyan-500 text-black px-6 py-3 font-black hover:bg-white transition-colors cursor-pointer shadow-[0_0_30px_rgba(6,182,212,0.4)] flex-1 text-center" onClick={() => { setHideGameOverModal(true); setShowPracticeSetup(true); }}>NEW_INSTANCE</button>
              </div>
            </div>
         </div>
@@ -313,6 +487,7 @@ export function HUD() {
         </div>
       </div>
 
+      {/* Share Image (offscreen) */}
       <div className="fixed left-[-9999px] top-0">
         <div 
           ref={shareRef} 
@@ -333,6 +508,19 @@ export function HUD() {
             <div>NET_RUN // LOG</div>
             {isDaily && <div className="text-lg tracking-[0.4em] text-cyan-500 font-bold bg-cyan-950/30 py-1">{new Date().toISOString().split('T')[0]}</div>}
           </div>
+          {/* Active ICE in share image */}
+          {activeICE.length > 0 && (
+            <div style={{ width: '100%', marginBottom: '16px', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {activeICE.map(iceId => {
+                const def = ICE_MODIFIERS.find(m => m.id === iceId);
+                return (
+                  <div key={iceId} className="text-[10px] font-black text-amber-400 tracking-wider border border-amber-500/40 px-3 py-1 bg-amber-950/30">
+                    {def?.name || iceId}
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {guesses.map((row, i) => (
               <div 
@@ -344,8 +532,11 @@ export function HUD() {
               >
                 {row.map((node, j) => {
                   const isSubmitted = i < currentRow || (isGameOver && node.status !== 'none');
+                  const isPhantomCol = activeICE.includes('PHANTOM_NODE') && j === phantomColumn && isSubmitted;
                   let colorStyle = { backgroundColor: '#111', borderColor: 'rgba(255,255,255,0.05)', boxShadow: 'none' };
-                  if (isSubmitted) {
+                  if (isPhantomCol) {
+                    colorStyle = { backgroundColor: '#a855f7', borderColor: '#a855f7', boxShadow: '0 0 15px rgba(168,85,247,0.5)' };
+                  } else if (isSubmitted) {
                     if (node.status === 'correct') colorStyle = { backgroundColor: colors.correct.hex, borderColor: colors.correct.hex, boxShadow: `0 0 15px ${colors.correct.shadowTw}` };
                     else if (node.status === 'misplaced') colorStyle = { backgroundColor: colors.misplaced.hex, borderColor: colors.misplaced.hex, boxShadow: `0 0 15px ${colors.misplaced.shadowTw}` };
                     else if (node.status === 'wrong') colorStyle = { backgroundColor: colors.wrong.hex, borderColor: colors.wrong.hex, boxShadow: 'none' };
